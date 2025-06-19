@@ -137,15 +137,11 @@ export default function Home() {
                                         )
                                     )
                                     .sort(
-                                        (pc, opc) =>
-                                            Number(
-                                                Boolean((status || {})[pc]?.gpus && (status || {})[pc]?.gpus.length > 0)
-                                            ) -
-                                            Number(
-                                                Boolean(
-                                                    (status || {})[opc]?.gpus && (status || {})[opc]?.gpus.length > 0
-                                                )
-                                            )
+                                        (pc, opc) => {
+                                            const hostnameA = (status || {})[pc]?.hostname || '';
+                                            const hostnameB = (status || {})[opc]?.hostname || '';
+                                            return hostnameA.localeCompare(hostnameB);
+                                        }
                                     )
                                     .map((pc) => (
                                         <li key={pc}>
@@ -227,9 +223,11 @@ export default function Home() {
                             )
                         )
                         .sort(
-                            (pc, opc) =>
-                                Number(Boolean((status || {})[pc]?.gpus && (status || {})[pc]?.gpus.length > 0)) -
-                                Number(Boolean((status || {})[opc]?.gpus && (status || {})[opc]?.gpus.length > 0))
+                            (pc, opc) => {
+                                const hostnameA = (status || {})[pc]?.hostname || '';
+                                const hostnameB = (status || {})[opc]?.hostname || '';
+                                return hostnameA.localeCompare(hostnameB);
+                            }
                         )
                         .map((pc) => (
                             <li key={pc}>
