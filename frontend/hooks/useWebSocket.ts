@@ -22,21 +22,33 @@ export const useWebSocket = (url: string): UseWebSocketReturn => {
     const maxReconnectAttempts = 10
     const reconnectDelay = 5000
 
+    // デバッグ用：環境変数の確認
+    console.log('Environment variables:', {
+        NODE_ENV: process.env.NODE_ENV,
+        NEXT_PUBLIC_WS_URL: process.env.NEXT_PUBLIC_WS_URL,
+    })
+
     const connect = useCallback(() => {
         try {
             // WebSocketのプロトコルとURLを決定
             let wsUrl: string
 
-            if (process.env.NODE_ENV === 'production') {
-                // GitHub Pages環境では外部サーバーに接続
-                // 環境変数またはデフォルトサーバーを使用
-                const serverUrl = process.env.NEXT_PUBLIC_WS_URL || 'wss://pcss.eov2.com/ws'
-                wsUrl = serverUrl
+            // 環境変数が設定されている場合は優先的に使用
+            const customUrl = process.env.NEXT_PUBLIC_WS_URL
+
+            if (customUrl) {
+                wsUrl = customUrl
+                console.log('Using custom WebSocket URL from env:', wsUrl)
+            } else if (process.env.NODE_ENV === 'production') {
+                // GitHub Pages環境ではデフォルトサーバーを使用
+                wsUrl = 'wss://pcss.eov2.com/ws'
+                console.log('Using default production WebSocket URL:', wsUrl)
             } else {
                 // 開発環境ではローカルサーバーに接続
                 const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
                 const host = window.location.host
-                wsUrl = `${protocol}//${host}/ws`
+                wsUrl = `${protocol}//${host}/server`
+                console.log('Using local development WebSocket URL:', wsUrl)
             }
 
             console.log('Connecting to WebSocket:', wsUrl)
@@ -106,7 +118,9 @@ export const useWebSocket = (url: string): UseWebSocketReturn => {
 
             ws.onerror = (event) => {
                 console.error('WebSocket error:', event)
-                setError('WebSocket connection error')
+                console.error('Failed to connect to:', wsUrl)
+                console.error('Make sure the server is running on the correct address and port')
+                setError(`WebSocket connection error: ${wsUrl}`)
             }
 
         } catch (err) {

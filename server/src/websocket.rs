@@ -49,6 +49,7 @@ impl WebSocketServer {
         info!("New WebSocket connection: {}", client_id);
 
         let (mut sender, mut receiver) = socket.split();
+        let mut broadcast_rx = self.broadcast_tx.subscribe();
 
         // 接続時の挨拶
         if let Err(e) = sender
@@ -64,25 +65,47 @@ impl WebSocketServer {
             return;
         }
 
-        // クライアントからのメッセージを処理
-        while let Some(msg) = receiver.next().await {
-            match msg {
-                Ok(Message::Text(text)) => {
-                    if let Err(e) = self.handle_text_message(&client_id, &text).await {
-                        error!("Error handling message: {}", e);
+        // 並行してメッセージを処理
+        tokio::select! {
+            // クライアントからのメッセージを処理
+            _ = async {
+                while let Some(msg) = receiver.next().await {
+                    match msg {
+                        Ok(Message::Text(text)) => {
+                            if let Err(e) = self.handle_text_message(&client_id, &text).await {
+                                error!("Error handling message: {}", e);
+                                break;
+                            }
+                        }
+                        Ok(Message::Close(_)) => {
+                            info!("WebSocket connection closed: {}", client_id);
+                            break;
+                        }
+                        Err(e) => {
+                            error!("WebSocket error: {}", e);
+                            break;
+                        }
+                        _ => {}
+                    }
+                }
+            } => {},
+            // ブロードキャストメッセージを転送
+            _ = async {
+                while let Ok(broadcast_msg) = broadcast_rx.recv().await {
+                    let json_msg = match broadcast_msg.to_json() {
+                        Ok(json) => json,
+                        Err(e) => {
+                            error!("Failed to serialize broadcast message: {}", e);
+                            continue;
+                        }
+                    };
+
+                    if let Err(e) = sender.send(Message::Text(json_msg.into())).await {
+                        error!("Failed to send broadcast message to client {}: {}", client_id, e);
                         break;
                     }
                 }
-                Ok(Message::Close(_)) => {
-                    info!("WebSocket connection closed: {}", client_id);
-                    break;
-                }
-                Err(e) => {
-                    error!("WebSocket error: {}", e);
-                    break;
-                }
-                _ => {}
-            }
+            } => {}
         }
 
         // クリーンアップ

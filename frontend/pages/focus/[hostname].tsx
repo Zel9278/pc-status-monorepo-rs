@@ -3,7 +3,6 @@ import { NextPage } from "next"
 import { useRouter } from "next/router"
 import { useEffect, useState } from "react"
 import styles from "../../styles/FocusPage.module.css"
-import io from "socket.io-client"
 
 const FocusPage: NextPage = () => {
     const { query, isReady } = useRouter()

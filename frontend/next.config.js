@@ -1,15 +1,18 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     reactStrictMode: true,
-    output: 'export',
-    trailingSlash: true,
+    // Only use static export in production for GitHub Pages
+    ...(process.env.NODE_ENV === 'production' && {
+        output: 'export',
+        trailingSlash: true,
+        assetPrefix: '/pc-status-monorepo-rs',
+        basePath: '/pc-status-monorepo-rs',
+    }),
     images: {
         unoptimized: true
     },
-    assetPrefix: process.env.NODE_ENV === 'production' ? '/pc-status-monorepo-rs' : '',
-    basePath: process.env.NODE_ENV === 'production' ? '/pc-status-monorepo-rs' : '',
+    // Development rewrites for local WebSocket server
     async rewrites() {
-        // Rewrites only work in development mode, not in static export
         if (process.env.NODE_ENV === 'development') {
             return [
                 {

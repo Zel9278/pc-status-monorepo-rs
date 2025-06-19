@@ -83,6 +83,61 @@ pnpm run dev
 - **自動デプロイ**: mainブランチのfrontend/配下の変更時（nextjs.ymlワークフロー）
 - **WebSocket接続**: デフォルトで公式サーバー（wss://pcss.eov2.com/ws）に接続
 
+#### 環境変数設定
+フロントエンドのWebSocket接続先を変更するには：
+
+1. **開発環境**: `frontend/.env.local`ファイルを作成
+```bash
+# カスタムWebSocketサーバーURL（フロントエンド用は/serverエンドポイント）
+NEXT_PUBLIC_WS_URL=ws://your-server-ip:port/server
+```
+
+2. **本番環境**: `frontend/.env`ファイルを編集
+```bash
+# GitHub Pages用のWebSocketサーバーURL（フロントエンド用は/serverエンドポイント）
+NEXT_PUBLIC_WS_URL=wss://your-server.com/server
+```
+
+**重要**:
+- **フロントエンド**: `/server` エンドポイントに接続（PC情報を受信）
+- **クライアント**: `/server` エンドポイントに接続（PC情報を送信）
+- `/ws` エンドポイントは将来の拡張用
+
+#### トラブルシューティング
+
+**WebSocket接続エラーが発生する場合:**
+
+1. **サーバーが起動しているか確認**
+```bash
+cargo run --bin server
+```
+
+2. **ポート番号を確認**
+- デフォルト: 3000番ポート
+- 環境変数: `PORT=3000`
+
+3. **ファイアウォール設定**
+- ポート3000番が開放されているか確認
+- Windows Defender/ウイルス対策ソフトの設定確認
+
+4. **IPアドレスの確認**
+```bash
+# Windows
+ipconfig
+
+# Linux/macOS
+ifconfig
+```
+
+5. **接続テスト**
+```bash
+# curlでHTTPエンドポイントをテスト
+curl http://100.108.46.68:3000
+
+# WebSocketテスト（ブラウザ開発者ツールで）
+new WebSocket('ws://100.108.46.68:3000/ws')
+```
+
 ## API仕様
 
 ### WebSocketメッセージ

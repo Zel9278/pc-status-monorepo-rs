@@ -83,6 +83,21 @@ The frontend is automatically deployed to GitHub Pages:
 - **Auto-deploy**: On changes to frontend/ in main branch (nextjs.yml workflow)
 - **WebSocket connection**: Connects to official server (wss://pcss.eov2.com/ws) by default
 
+#### Environment Variables
+To change the frontend WebSocket connection target:
+
+1. **Development**: Create `frontend/.env.local` file
+```bash
+# Custom WebSocket server URL
+NEXT_PUBLIC_WS_URL=ws://your-server-ip:port/ws
+```
+
+2. **Production**: Edit `frontend/.env` file
+```bash
+# WebSocket server URL for GitHub Pages
+NEXT_PUBLIC_WS_URL=wss://your-server.com/ws
+```
+
 ## API Specification
 
 ### WebSocket Messages
