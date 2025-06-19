@@ -36,21 +36,21 @@ export const useWebSocket = (url: string): UseWebSocketReturn => {
             // 環境変数が設定されている場合は優先的に使用
             const customUrl = process.env.NEXT_PUBLIC_WS_URL
 
-            if (customUrl) {
+            if (customUrl && customUrl.trim() !== '' && customUrl !== 'undefined') {
                 wsUrl = customUrl
                 console.log('Using custom WebSocket URL from env:', wsUrl)
-            } else if (process.env.NODE_ENV === 'production') {
-                // 本番環境では現在のホストのWebSocketサーバーに接続
-                const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-                const host = window.location.host
-                wsUrl = `${protocol}//${host}/server`
-                console.log('Using production WebSocket URL:', wsUrl)
             } else {
-                // 開発環境ではローカルサーバーに接続
+                // 現在のホストを使用してWebSocket URLを構築
                 const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
                 const host = window.location.host
                 wsUrl = `${protocol}//${host}/server`
-                console.log('Using local development WebSocket URL:', wsUrl)
+                console.log('Using auto-detected WebSocket URL:', wsUrl)
+                console.log('Current location:', {
+                    protocol: window.location.protocol,
+                    host: window.location.host,
+                    hostname: window.location.hostname,
+                    port: window.location.port
+                })
             }
 
             console.log('Connecting to WebSocket:', wsUrl)
@@ -134,6 +134,11 @@ export const useWebSocket = (url: string): UseWebSocketReturn => {
             ws.onerror = (event) => {
                 console.error('WebSocket error:', event)
                 console.error('Failed to connect to:', wsUrl)
+                console.error('Current page URL:', window.location.href)
+                console.error('Environment variables:', {
+                    NODE_ENV: process.env.NODE_ENV,
+                    NEXT_PUBLIC_WS_URL: process.env.NEXT_PUBLIC_WS_URL
+                })
                 console.error('Make sure the server is running on the correct address and port')
                 setError(`WebSocket connection error: ${wsUrl}`)
             }

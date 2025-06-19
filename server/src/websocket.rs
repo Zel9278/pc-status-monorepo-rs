@@ -52,13 +52,12 @@ impl WebSocketServer {
         let mut broadcast_rx = self.broadcast_tx.subscribe();
 
         // 接続時の挨拶
+        let hello_message = ServerMessage::Hi("hello".to_string());
+        let hello_json = hello_message.to_json().unwrap_or_default();
+        debug!("Sending hello message: {}", hello_json);
+
         if let Err(e) = sender
-            .send(Message::Text(
-                ServerMessage::Hi("hello".to_string())
-                    .to_json()
-                    .unwrap_or_default()
-                    .into(),
-            ))
+            .send(Message::Text(hello_json.into()))
             .await
         {
             error!("Failed to send hello message: {}", e);
