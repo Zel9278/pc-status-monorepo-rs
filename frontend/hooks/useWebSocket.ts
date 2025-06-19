@@ -28,6 +28,21 @@ export const useWebSocket = (url: string): UseWebSocketReturn => {
         NEXT_PUBLIC_WS_URL: process.env.NEXT_PUBLIC_WS_URL,
     })
 
+    // デバッグ用：ブラウザ情報の確認
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            console.log('Browser environment:', {
+                location: window.location.href,
+                protocol: window.location.protocol,
+                host: window.location.host,
+                hostname: window.location.hostname,
+                port: window.location.port,
+                pathname: window.location.pathname,
+                userAgent: navigator.userAgent
+            })
+        }
+    }, [])
+
     const connect = useCallback(() => {
         try {
             // WebSocketのプロトコルとURLを決定
@@ -40,7 +55,7 @@ export const useWebSocket = (url: string): UseWebSocketReturn => {
                 wsUrl = customUrl
                 console.log('Using custom WebSocket URL from env:', wsUrl)
             } else {
-                // 現在のホストを使用してWebSocket URLを構築
+                // フォールバック: 現在のホストを使用してWebSocket URLを構築
                 const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
                 const host = window.location.host
                 wsUrl = `${protocol}//${host}/server`
@@ -51,6 +66,8 @@ export const useWebSocket = (url: string): UseWebSocketReturn => {
                     hostname: window.location.hostname,
                     port: window.location.port
                 })
+                console.warn('No NEXT_PUBLIC_WS_URL environment variable found. Using auto-detected URL.')
+                console.warn('If WebSocket connection fails, make sure the server is running on the same domain.')
             }
 
             console.log('Connecting to WebSocket:', wsUrl)

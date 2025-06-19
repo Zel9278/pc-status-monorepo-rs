@@ -93,6 +93,7 @@ jobs:
           NODE_ENV: production
           CI: true
           CUSTOM_DOMAIN: true
+          NEXT_PUBLIC_WS_URL: wss://www.pc-status.net/server
 
       - name: List build output
         run: |
