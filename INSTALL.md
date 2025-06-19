@@ -26,23 +26,34 @@ PC Status Monitor (Rust Monorepo) のインストール手順を説明します�
 
 1. [GitHubリリースページ](https://github.com/your-username/pc-status-monorepo-rs/releases)にアクセス
 2. 最新リリースを選択
-3. お使いのプラットフォームに対応するファイルをダウンロード:
-   - **macOS (M1/M2)**: `pc-status-macos-arm64.tar.gz`
-   - **Windows 64-bit**: `pc-status-windows-x64.zip`
-   - **Linux 64-bit**: `pc-status-linux-x64.tar.gz`
-   - **Linux ARM64**: `pc-status-linux-arm64.tar.gz`
+3. 必要なコンポーネントをダウンロード:
+
+**クライアント（システム情報収集）:**
+   - **macOS (M1/M2)**: `pc-status-client-macos-arm64.tar.gz`
+   - **Windows 64-bit**: `pc-status-client-windows-x64.zip`
+   - **Linux 64-bit**: `pc-status-client-linux-x64.tar.gz`
+   - **Linux ARM64**: `pc-status-client-linux-arm64.tar.gz`
+
+**バックエンド（サーバー）:**
+   - **macOS (M1/M2)**: `pc-status-backend-macos-arm64.tar.gz`
+   - **Windows 64-bit**: `pc-status-backend-windows-x64.zip`
+   - **Linux 64-bit**: `pc-status-backend-linux-x64.tar.gz`
+   - **Linux ARM64**: `pc-status-backend-linux-arm64.tar.gz`
 
 #### 2. ファイルの展開と配置
 
 **Linux/macOS:**
 ```bash
-# ダウンロードしたファイルを展開
-tar -xzf pc-status-linux-x64.tar.gz  # または対応するファイル名
+# クライアントとバックエンドを展開
+tar -xzf pc-status-client-linux-x64.tar.gz
+tar -xzf pc-status-backend-linux-x64.tar.gz
 
 # バイナリを適切な場所に配置
 sudo mkdir -p /opt/pc-status
-sudo cp server client /opt/pc-status/
+sudo cp client /opt/pc-status/  # クライアントから
+sudo cp server /opt/pc-status/  # バックエンドから
 sudo cp *.env.example /opt/pc-status/
+sudo cp *.service /opt/pc-status/  # systemdサービスファイル
 sudo chmod +x /opt/pc-status/server /opt/pc-status/client
 
 # シンボリックリンクを作成（オプション）
@@ -53,7 +64,12 @@ sudo ln -s /opt/pc-status/client /usr/local/bin/pc-status-client
 **Windows:**
 ```powershell
 # ZIPファイルを展開
-Expand-Archive -Path pc-status-windows-x64.zip -DestinationPath C:\pc-status
+Expand-Archive -Path pc-status-client-windows-x64.zip -DestinationPath C:\pc-status\client
+Expand-Archive -Path pc-status-backend-windows-x64.zip -DestinationPath C:\pc-status\server
+
+# バイナリを統合
+Copy-Item C:\pc-status\client\client.exe C:\pc-status\
+Copy-Item C:\pc-status\server\server.exe C:\pc-status\
 
 # 環境変数PATHに追加（オプション）
 $env:PATH += ";C:\pc-status"

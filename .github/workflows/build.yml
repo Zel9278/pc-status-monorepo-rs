@@ -34,8 +34,8 @@ jobs:
       - name: Run tests
         run: cargo test --verbose
 
-  build:
-    name: Build
+  build-client:
+    name: Build Client
     needs: test
     strategy:
       matrix:
@@ -44,17 +44,17 @@ jobs:
           - target: aarch64-apple-darwin
             os: macos-latest
             name: macos-arm64
-            
+
           # Windows 64-bit MSVC
           - target: x86_64-pc-windows-msvc
             os: windows-latest
             name: windows-x64
-            
+
           # Linux 64-bit musl
           - target: x86_64-unknown-linux-musl
             os: ubuntu-latest
             name: linux-x64
-            
+
           # Linux ARM musl
           - target: aarch64-unknown-linux-musl
             os: ubuntu-latest
@@ -99,78 +99,188 @@ jobs:
           echo '[target.aarch64-unknown-linux-musl]' >> ~/.cargo/config.toml
           echo 'linker = "aarch64-linux-gnu-gcc"' >> ~/.cargo/config.toml
           
-      - name: Build server
-        run: cargo build --release --bin server --target ${{ matrix.target }}
-        
       - name: Build client
         run: cargo build --release --bin client --target ${{ matrix.target }}
-        
+
       - name: Create release directory
         shell: bash
         run: |
           mkdir -p release
-          
-      - name: Copy binaries (Unix)
+
+      - name: Copy client binary (Unix)
         if: matrix.os != 'windows-latest'
         run: |
-          cp target/${{ matrix.target }}/release/server release/
           cp target/${{ matrix.target }}/release/client release/
-          
-      - name: Copy binaries (Windows)
+
+      - name: Copy client binary (Windows)
         if: matrix.os == 'windows-latest'
         run: |
-          cp target/${{ matrix.target }}/release/server.exe release/
           cp target/${{ matrix.target }}/release/client.exe release/
-          
-      - name: Copy configuration files
+
+      - name: Copy client configuration files
         run: |
-          cp server/.env.example release/server.env.example
           cp client/.env.example release/client.env.example
+          cp systemd/pc-status-client.service release/
           cp README.md release/
           cp README.en.md release/
           cp INSTALL.md release/
           cp INSTALL_en.md release/
-          
-      - name: Create archive (Unix)
+
+      - name: Create client archive (Unix)
         if: matrix.os != 'windows-latest'
         run: |
           cd release
-          tar -czf ../pc-status-${{ matrix.name }}.tar.gz *
-          
-      - name: Create archive (Windows)
+          tar -czf ../pc-status-client-${{ matrix.name }}.tar.gz *
+
+      - name: Create client archive (Windows)
         if: matrix.os == 'windows-latest'
         run: |
           cd release
-          7z a ../pc-status-${{ matrix.name }}.zip *
-          
-      - name: Upload artifacts
+          7z a ../pc-status-client-${{ matrix.name }}.zip *
+
+      - name: Upload client artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: pc-status-${{ matrix.name }}
+          name: pc-status-client-${{ matrix.name }}
           path: |
-            pc-status-${{ matrix.name }}.tar.gz
-            pc-status-${{ matrix.name }}.zip
+            pc-status-client-${{ matrix.name }}.tar.gz
+            pc-status-client-${{ matrix.name }}.zip
+          if-no-files-found: ignore
+
+  build-backend:
+    name: Build Backend
+    needs: test
+    strategy:
+      matrix:
+        include:
+          # Apple ARM (M1/M2)
+          - target: aarch64-apple-darwin
+            os: macos-latest
+            name: macos-arm64
+
+          # Windows 64-bit MSVC
+          - target: x86_64-pc-windows-msvc
+            os: windows-latest
+            name: windows-x64
+
+          # Linux 64-bit musl
+          - target: x86_64-unknown-linux-musl
+            os: ubuntu-latest
+            name: linux-x64
+
+          # Linux ARM musl
+          - target: aarch64-unknown-linux-musl
+            os: ubuntu-latest
+            name: linux-arm64
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Cache cargo registry
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-${{ matrix.target }}-cargo-${{ hashFiles('**/Cargo.toml') }}-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ matrix.target }}-cargo-
+            ${{ runner.os }}-cargo-
+
+      - name: Install musl tools (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y musl-tools musl-dev
+
+      - name: Install cross-compilation tools (Linux ARM)
+        if: matrix.target == 'aarch64-unknown-linux-musl'
+        run: |
+          sudo apt-get install -y gcc-aarch64-linux-gnu
+
+      - name: Configure cross-compilation (Linux ARM)
+        if: matrix.target == 'aarch64-unknown-linux-musl'
+        run: |
+          echo '[target.aarch64-unknown-linux-musl]' >> ~/.cargo/config.toml
+          echo 'linker = "aarch64-linux-gnu-gcc"' >> ~/.cargo/config.toml
+
+      - name: Build server
+        run: cargo build --release --bin server --target ${{ matrix.target }}
+
+      - name: Create release directory
+        shell: bash
+        run: |
+          mkdir -p release
+
+      - name: Copy server binary (Unix)
+        if: matrix.os != 'windows-latest'
+        run: |
+          cp target/${{ matrix.target }}/release/server release/
+
+      - name: Copy server binary (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          cp target/${{ matrix.target }}/release/server.exe release/
+
+      - name: Copy server configuration files
+        run: |
+          cp server/.env.example release/server.env.example
+          cp systemd/pc-status-server.service release/
+          cp README.md release/
+          cp README.en.md release/
+          cp INSTALL.md release/
+          cp INSTALL_en.md release/
+
+      - name: Create backend archive (Unix)
+        if: matrix.os != 'windows-latest'
+        run: |
+          cd release
+          tar -czf ../pc-status-backend-${{ matrix.name }}.tar.gz *
+
+      - name: Create backend archive (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          cd release
+          7z a ../pc-status-backend-${{ matrix.name }}.zip *
+
+      - name: Upload backend artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: pc-status-backend-${{ matrix.name }}
+          path: |
+            pc-status-backend-${{ matrix.name }}.tar.gz
+            pc-status-backend-${{ matrix.name }}.zip
           if-no-files-found: ignore
 
   release:
     name: Create Release
-    needs: build
+    needs: [build-client, build-backend]
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v')
-    
+
     steps:
       - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
           pattern: pc-status-*
           merge-multiple: true
-        
+
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            pc-status-*/pc-status-*.tar.gz
-            pc-status-*/pc-status-*.zip
+            pc-status-client-*.tar.gz
+            pc-status-client-*.zip
+            pc-status-backend-*.tar.gz
+            pc-status-backend-*.zip
           draft: false
           prerelease: false
         env:

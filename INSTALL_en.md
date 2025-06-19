@@ -26,23 +26,34 @@ The easiest way using pre-built binaries.
 
 1. Visit the [GitHub Releases page](https://github.com/your-username/pc-status-monorepo-rs/releases)
 2. Select the latest release
-3. Download the file for your platform:
-   - **macOS (M1/M2)**: `pc-status-macos-arm64.tar.gz`
-   - **Windows 64-bit**: `pc-status-windows-x64.zip`
-   - **Linux 64-bit**: `pc-status-linux-x64.tar.gz`
-   - **Linux ARM64**: `pc-status-linux-arm64.tar.gz`
+3. Download the required components:
+
+**Client (System Information Collection):**
+   - **macOS (M1/M2)**: `pc-status-client-macos-arm64.tar.gz`
+   - **Windows 64-bit**: `pc-status-client-windows-x64.zip`
+   - **Linux 64-bit**: `pc-status-client-linux-x64.tar.gz`
+   - **Linux ARM64**: `pc-status-client-linux-arm64.tar.gz`
+
+**Backend (Server):**
+   - **macOS (M1/M2)**: `pc-status-backend-macos-arm64.tar.gz`
+   - **Windows 64-bit**: `pc-status-backend-windows-x64.zip`
+   - **Linux 64-bit**: `pc-status-backend-linux-x64.tar.gz`
+   - **Linux ARM64**: `pc-status-backend-linux-arm64.tar.gz`
 
 #### 2. Extract and Install
 
 **Linux/macOS:**
 ```bash
-# Extract the downloaded file
-tar -xzf pc-status-linux-x64.tar.gz  # or corresponding filename
+# Extract client and backend
+tar -xzf pc-status-client-linux-x64.tar.gz
+tar -xzf pc-status-backend-linux-x64.tar.gz
 
 # Place binaries in appropriate location
 sudo mkdir -p /opt/pc-status
-sudo cp server client /opt/pc-status/
+sudo cp client /opt/pc-status/  # from client archive
+sudo cp server /opt/pc-status/  # from backend archive
 sudo cp *.env.example /opt/pc-status/
+sudo cp *.service /opt/pc-status/  # systemd service files
 sudo chmod +x /opt/pc-status/server /opt/pc-status/client
 
 # Create symbolic links (optional)
@@ -52,8 +63,13 @@ sudo ln -s /opt/pc-status/client /usr/local/bin/pc-status-client
 
 **Windows:**
 ```powershell
-# Extract ZIP file
-Expand-Archive -Path pc-status-windows-x64.zip -DestinationPath C:\pc-status
+# Extract ZIP files
+Expand-Archive -Path pc-status-client-windows-x64.zip -DestinationPath C:\pc-status\client
+Expand-Archive -Path pc-status-backend-windows-x64.zip -DestinationPath C:\pc-status\server
+
+# Consolidate binaries
+Copy-Item C:\pc-status\client\client.exe C:\pc-status\
+Copy-Item C:\pc-status\server\server.exe C:\pc-status\
 
 # Add to PATH environment variable (optional)
 $env:PATH += ";C:\pc-status"

@@ -154,7 +154,10 @@ GitHub Actions automatically builds for the following platforms:
 - **Linux x64** (x86_64-unknown-linux-musl) - Linux 64-bit
 - **Linux ARM64** (aarch64-unknown-linux-musl) - Linux ARM 64-bit
 
-When you push a release tag (`v*`), binaries for all platforms are automatically built and attached to the GitHub release.
+When you push a release tag (`v*`), client and backend are built separately and attached to the GitHub release:
+
+- **Client**: `pc-status-client-{platform}.tar.gz/.zip`
+- **Backend**: `pc-status-backend-{platform}.tar.gz/.zip`
 
 ## Changes from Original TypeScript Project
 

@@ -154,7 +154,10 @@ GitHub Actionsを使用して以下のプラットフォーム向けに自動ビ
 - **Linux x64** (x86_64-unknown-linux-musl) - Linux 64-bit
 - **Linux ARM64** (aarch64-unknown-linux-musl) - Linux ARM 64-bit
 
-リリースタグ（`v*`）をプッシュすると、全プラットフォーム向けのバイナリが自動的にビルドされ、GitHubリリースに添付されます。
+リリースタグ（`v*`）をプッシュすると、クライアントとバックエンドが別々にビルドされ、GitHubリリースに添付されます：
+
+- **クライアント**: `pc-status-client-{platform}.tar.gz/.zip`
+- **バックエンド**: `pc-status-backend-{platform}.tar.gz/.zip`
 
 ## 元のTypeScriptプロジェクトからの変更点
 
