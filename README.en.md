@@ -204,6 +204,7 @@ When you push a release tag (`v*`), client and backend are built separately and 
 6. **TLS Library**: OpenSSL → rustls (pure Rust implementation)
 7. **HTTP Routing**: Axum 0.8 compatibility (nest → fallback_service)
 8. **OS Detection**: Field name unification (os → _os) and icon display fix
+9. **GPU Display**: Fixed double unit conversion (PB notation → proper GB notation)
 
 ### Frontend
 1. **WebSocket Communication**: Socket.IO Client → Native WebSocket API

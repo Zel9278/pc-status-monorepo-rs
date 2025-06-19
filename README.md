@@ -258,6 +258,7 @@ GitHub Actionsを使用して以下の自動化を行います：
 6. **TLSライブラリ**: OpenSSL → rustls（純粋Rust実装）
 7. **HTTPルーティング**: Axum 0.8対応（nest → fallback_service）
 8. **OS判別**: フィールド名統一（os → _os）とアイコン表示修正
+9. **GPU表示**: 二重単位変換を修正（PB表記 → 正常なGB表記）
 
 ### フロントエンド
 1. **WebSocket通信**: Socket.IO Client → Native WebSocket API

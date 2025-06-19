@@ -87,9 +87,29 @@ jobs:
         working-directory: ./frontend
         
       - name: Build with Next.js
-        run: ${{ steps.detect-package-manager.outputs.runner }} run build
+        run: ${{ steps.detect-package-manager.outputs.runner }} run export
         working-directory: ./frontend
-        
+        env:
+          NODE_ENV: production
+          CI: true
+
+      - name: List build output
+        run: |
+          echo "Listing frontend directory:"
+          ls -la ./frontend/
+          echo "Checking for out directory:"
+          if [ -d "./frontend/out" ]; then
+            echo "out directory exists"
+            ls -la ./frontend/out/
+          else
+            echo "out directory does not exist"
+            echo "Checking for .next directory:"
+            if [ -d "./frontend/.next" ]; then
+              echo ".next directory exists"
+              ls -la ./frontend/.next/
+            fi
+          fi
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:

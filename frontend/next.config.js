@@ -1,8 +1,18 @@
 /** @type {import('next').NextConfig} */
+
+// デバッグ用ログ
+console.log('Next.js Config Environment:', {
+    NODE_ENV: process.env.NODE_ENV,
+    CI: process.env.CI,
+    shouldExport: !!(process.env.CI || process.env.NODE_ENV === 'production')
+});
+
+const isStaticExport = !!(process.env.CI || process.env.NODE_ENV === 'production');
+
 const nextConfig = {
     reactStrictMode: true,
-    // Only use static export in production for GitHub Pages
-    ...(process.env.NODE_ENV === 'production' && {
+    // Use static export for GitHub Pages deployment
+    ...(isStaticExport && {
         output: 'export',
         trailingSlash: true,
         assetPrefix: '/pc-status-monorepo-rs',
@@ -13,7 +23,7 @@ const nextConfig = {
     },
     // Development rewrites for local WebSocket server
     async rewrites() {
-        if (process.env.NODE_ENV === 'development') {
+        if (process.env.NODE_ENV === 'development' && !process.env.CI) {
             return [
                 {
                     source: '/ws',
