@@ -29,12 +29,72 @@ This monorepo consists of the following components:
 - System information collection (CPU, memory, disk, GPU, etc.)
 - Data transmission to server via WebSocket
 - Auto-reconnection functionality
-- GPU information collection (NVIDIA GPU support)
+- **Multi-GPU Support** (Intel/AMD/NVIDIA GPU unified monitoring)
 - OS compatibility check
 - Environment variable configuration
 - Custom hostname setting
 - Development mode support (allows duplicate hostnames)
 - Secure TLS communication using rustls
+
+### GPU Monitoring Features
+
+This project provides a comprehensive GPU monitoring system that can uniformly monitor Intel, AMD, and NVIDIA GPUs.
+
+#### Supported GPUs
+- **Intel GPU**: Integrated graphics (UHD Graphics, Iris, etc.)
+- **AMD GPU**: Radeon series ⚠️ **Untested**
+- **NVIDIA GPU**: GeForce, RTX, GTX series ✅ **Tested**
+
+#### Platform-specific Support
+
+**Windows** ✅ **Supported**
+- **Intel**: Detection via WMI (Windows Management Instrumentation) ✅ **Tested**
+- **AMD**: Detection via WMI (Windows Management Instrumentation) ⚠️ **Untested**
+- **NVIDIA**: Detection via nvidia-smi command ✅ **Tested**
+- **Dynamic monitoring**: Real-time updates of usage and memory consumption
+
+**Linux** ⚠️ **Implemented but Untested**
+- **Intel**: Detection via lspci + intel_gpu_top + /sys/class/drm/ ⚠️ **Untested**
+- **AMD**: Detection via lspci + radeontop + /sys/class/drm/ ⚠️ **Untested**
+- **NVIDIA**: Detection via nvidia-smi command ✅ **Tested**
+
+**macOS** ❌ **Not Supported**
+
+#### Information Collected
+- **GPU Usage**: Real-time usage percentage (%)
+- **Memory Usage**: Used/Total/Available capacity
+- **GPU Name**: Accurate GPU name identification
+- **Multiple GPUs**: Simultaneous monitoring and display of multiple GPUs
+
+#### Recommended Packages for Linux
+
+For optimal performance, we recommend installing the following packages:
+
+```bash
+# Ubuntu/Debian
+sudo apt install pciutils intel-gpu-tools radeontop
+
+# Fedora/RHEL
+sudo dnf install pciutils intel-gpu-tools radeontop
+
+# Arch Linux
+sudo pacman -S pciutils intel-gpu-tools radeontop
+```
+
+**Note**: Basic detection will work without these packages, but they are recommended for more detailed information retrieval.
+
+#### Testing Status
+
+⚠️ **Important**: The following GPU/platform combinations are implemented but have not been tested in real environments:
+
+- **AMD GPU**: All platforms (Windows/Linux)
+- **Linux environment**: Intel GPU, AMD GPU
+
+We welcome testing reports and issue reports for these environments. Issues and Pull Requests are appreciated.
+
+**Tested environments**:
+- Windows + Intel GPU (integrated graphics)
+- Windows/Linux + NVIDIA GPU
 
 ## Installation
 
@@ -232,6 +292,8 @@ When you push a release tag (`v*`), client and backend are built separately and 
 11. **Chart Optimization**: Replaced Chart.js with custom Canvas rendering, reduced bundle size by 67KB, responsive design
 12. **Focus Optimization**: Eliminated pre-generation of all PC Focus components, dynamic rendering reduces memory usage
 13. **About Screen Update**: Updated information to reflect monorepo structure, detailed tech stack
+14. **Multi-GPU Support**: Intel/AMD/NVIDIA GPU unified monitoring, Windows (WMI)/Linux (lspci+sysfs) support
+15. **Dynamic GPU Monitoring**: Real-time usage and memory consumption updates, simultaneous multi-GPU display
 
 ### Frontend
 1. **WebSocket Communication**: Socket.IO Client → Native WebSocket API

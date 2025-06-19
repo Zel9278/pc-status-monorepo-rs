@@ -29,12 +29,72 @@ TypeScriptのSocket.IOベースのPC Status MonitorをRustのfastwebsocketsに�
 - システム情報の収集（CPU、メモリ、ディスク、GPU等）
 - WebSocket経由でのサーバーへのデータ送信
 - 自動再接続機能
-- GPU情報の収集（NVIDIA GPU対応）
+- **複数GPU対応**（Intel/AMD/NVIDIA GPU統一監視）
 - OS互換性チェック
 - 環境変数による設定
 - カスタムホスト名設定
 - 開発モード対応（重複ホスト名許可）
 - rustls使用による安全なTLS通信
+
+### GPU監視機能
+
+このプロジェクトは、Intel、AMD、NVIDIAのGPUを統一的に監視できる包括的なGPU監視システムを提供します。
+
+#### 対応GPU
+- **Intel GPU**: 統合グラフィックス（UHD Graphics、Iris等）
+- **AMD GPU**: Radeon シリーズ ⚠️ **動作未確認**
+- **NVIDIA GPU**: GeForce、RTX、GTX シリーズ ✅ **動作確認済み**
+
+#### プラットフォーム別対応
+
+**Windows** ✅ **対応済み**
+- **Intel**: WMI (Windows Management Instrumentation) 経由で検出 ✅ **動作確認済み**
+- **AMD**: WMI (Windows Management Instrumentation) 経由で検出 ⚠️ **動作未確認**
+- **NVIDIA**: nvidia-smi コマンド経由で検出 ✅ **動作確認済み**
+- **動的監視**: 使用率とメモリ使用量のリアルタイム更新
+
+**Linux** ⚠️ **実装済み・動作未確認**
+- **Intel**: lspci + intel_gpu_top + /sys/class/drm/ 経由で検出 ⚠️ **動作未確認**
+- **AMD**: lspci + radeontop + /sys/class/drm/ 経由で検出 ⚠️ **動作未確認**
+- **NVIDIA**: nvidia-smi コマンド経由で検出 ✅ **動作確認済み**
+
+**macOS** ❌ **非対応**
+
+#### 取得情報
+- **GPU使用率**: リアルタイムの使用率（%）
+- **メモリ使用量**: 使用中/総容量/利用可能容量
+- **GPU名**: 正確なGPU名の識別
+- **複数GPU**: 複数のGPUを同時に監視・表示
+
+#### Linux環境での推奨パッケージ
+
+最適な動作のために、以下のパッケージのインストールを推奨します：
+
+```bash
+# Ubuntu/Debian
+sudo apt install pciutils intel-gpu-tools radeontop
+
+# Fedora/RHEL
+sudo dnf install pciutils intel-gpu-tools radeontop
+
+# Arch Linux
+sudo pacman -S pciutils intel-gpu-tools radeontop
+```
+
+**注意**: これらのパッケージがなくても基本的な検出は動作しますが、より詳細な情報取得のために推奨されます。
+
+#### 動作確認状況
+
+⚠️ **重要**: 以下のGPU・プラットフォーム組み合わせは実装済みですが、実際の動作確認が完了していません：
+
+- **AMD GPU**: すべてのプラットフォーム（Windows/Linux）
+- **Linux環境**: Intel GPU、AMD GPU
+
+これらの環境での動作報告や問題報告をお待ちしています。Issue報告やPull Requestを歓迎します。
+
+**動作確認済み環境**:
+- Windows + Intel GPU（統合グラフィックス）
+- Windows/Linux + NVIDIA GPU
 
 ## インストール
 
@@ -315,6 +375,8 @@ GitHub Actionsを使用して以下の自動化を行います：
 11. **グラフ最適化**: Chart.js廃止、Canvas独自描画でバンドルサイズ67KB削減、レスポンシブ対応
 12. **Focus最適化**: 全PC分のFocus事前生成を廃止、動的表示でメモリ使用量削減
 13. **About画面更新**: モノレポ構成に合わせた情報表示、技術スタック明記
+14. **複数GPU対応**: Intel/AMD/NVIDIA GPU統一監視、Windows（WMI）/Linux（lspci+sysfs）対応
+15. **動的GPU監視**: リアルタイム使用率・メモリ使用量更新、複数GPU同時表示
 
 ### フロントエンド
 1. **WebSocket通信**: Socket.IO Client → Native WebSocket API
