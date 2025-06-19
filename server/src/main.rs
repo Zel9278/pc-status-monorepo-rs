@@ -47,7 +47,10 @@ async fn main() -> Result<()> {
 
             // すべてのクライアントデータを取得してブロードキャスト
             let clients = client_manager_clone.get_all_clients().await;
-            let _ = broadcast_sender.send(pc_status_shared::ServerMessage::Status(clients));
+            if !clients.is_empty() {
+                info!("Broadcasting status data for {} clients", clients.len());
+                let _ = broadcast_sender.send(pc_status_shared::ServerMessage::Status(clients));
+            }
         }
     });
 

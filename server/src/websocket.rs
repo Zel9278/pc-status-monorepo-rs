@@ -92,6 +92,7 @@ impl WebSocketServer {
             // ブロードキャストメッセージを転送
             _ = async {
                 while let Ok(broadcast_msg) = broadcast_rx.recv().await {
+                    debug!("Broadcasting message to client {}: {:?}", client_id, broadcast_msg);
                     let json_msg = match broadcast_msg.to_json() {
                         Ok(json) => json,
                         Err(e) => {
@@ -103,6 +104,8 @@ impl WebSocketServer {
                     if let Err(e) = sender.send(Message::Text(json_msg.into())).await {
                         error!("Failed to send broadcast message to client {}: {}", client_id, e);
                         break;
+                    } else {
+                        debug!("Successfully sent broadcast message to client {}", client_id);
                     }
                 }
             } => {}

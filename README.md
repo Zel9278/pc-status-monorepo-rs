@@ -135,8 +135,22 @@ ifconfig
 curl http://100.108.46.68:3000
 
 # WebSocketテスト（ブラウザ開発者ツールで）
-new WebSocket('ws://100.108.46.68:3000/ws')
+new WebSocket('ws://100.108.46.68:3000/server')
 ```
+
+6. **ログレベルの設定**
+```bash
+# デバッグログを有効にしてサーバー起動
+RUST_LOG=debug cargo run --bin server
+
+# クライアントもデバッグログで起動
+RUST_LOG=debug cargo run --bin client
+```
+
+7. **データフローの確認**
+- クライアント → サーバー: PC情報送信
+- サーバー → フロントエンド: ブロードキャスト（1秒間隔）
+- フロントエンド: リアルタイム表示
 
 ## API仕様
 
