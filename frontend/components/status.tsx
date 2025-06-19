@@ -1,4 +1,5 @@
 import { Fragment, ReactNode, useEffect, useState } from "react"
+import Image from "next/image"
 import { ClientData } from "../types/client"
 import { useRouter } from "next/router"
 import selectIcon from "../Utils/selectIcon"
@@ -9,9 +10,10 @@ type Props = {
     children?: ReactNode
     status: ClientData
     pc: string
+    onFocusClick?: () => void
 }
 
-const Status = ({ children, status, pc }: Props) => {
+const Status = ({ children, status, pc, onFocusClick }: Props) => {
     const [hash, setHash] = useState({})
     const { isReady } = useRouter()
     const pcData = (status || {})[pc]
@@ -34,7 +36,7 @@ const Status = ({ children, status, pc }: Props) => {
                     : {}
             setHash(border)
         }
-    }, [isReady])
+    }, [isReady, pcData?.hostname])
 
     useEffect(() => {
         addEventListener("hashchange", (e) => {
@@ -47,7 +49,7 @@ const Status = ({ children, status, pc }: Props) => {
                     : {}
             setHash(border)
         })
-    }, [])
+    }, [pcData?.hostname])
 
     return (
         <Fragment key={pc}>
@@ -59,17 +61,22 @@ const Status = ({ children, status, pc }: Props) => {
                 <div className="card-body">
                     <div className="avatar center">
                         <div className="w-12">
-                            <img src={selectIcon(pcData?._os)} />
+                            <Image
+                                src={selectIcon(pcData?._os)}
+                                alt={`${pcData?._os} icon`}
+                                width={48}
+                                height={48}
+                            />
                         </div>
                     </div>
                     <h2 className="card-title flex justify-between">
                         {pcData?.hostname}
-                        <label
-                            htmlFor={`focus-${pcData?.hostname}-modal`}
+                        <button
+                            onClick={onFocusClick}
                             className="btn border-none bg-base-50 bg-transparent"
                         >
                             Focus
-                        </label>
+                        </button>
                     </h2>
 
                     <div>

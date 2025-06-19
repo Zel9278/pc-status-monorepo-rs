@@ -56,9 +56,32 @@ cargo run --bin server
 ```
 
 サーバーは以下のエンドポイントを提供します：
-- `http://localhost:3000/` - ルートエンドポイント
+- `http://localhost:3000/` - ルートエンドポイント（フロントエンド配信）
 - `ws://localhost:3000/ws` - WebSocket接続
 - `ws://localhost:3000/server` - サーバー用WebSocket接続
+
+#### フロントエンド統合配信
+
+サーバーは自動的にフロントエンドの静的ファイルを配信します。以下の優先順位でディレクトリを検索します：
+
+1. `./frontend` - バイナリと同じディレクトリ
+2. `./out` - バイナリと同じディレクトリ
+3. `./www` - バイナリと同じディレクトリ
+4. `./static` - バイナリと同じディレクトリ
+5. `./frontend/out` - 開発時用
+
+**本番環境での使用例:**
+```bash
+# フロントエンドをビルド
+cd frontend
+pnpm run export
+
+# ビルド成果物をサーバーバイナリと同じ場所にコピー
+cp -r out /path/to/server/frontend
+
+# サーバー起動（フロントエンドも自動配信）
+/path/to/server/server
+```
 
 ### クライアントの起動
 
@@ -288,6 +311,10 @@ GitHub Actionsを使用して以下の自動化を行います：
 7. **HTTPルーティング**: Axum 0.8対応（nest → fallback_service）
 8. **OS判別**: フィールド名統一（os → _os）とアイコン表示修正
 9. **GPU表示**: 二重単位変換を修正（PB表記 → 正常なGB表記）
+10. **Uptime表示**: 生秒数から読みやすい形式に修正（例: "1d 2h 30m 45s"）
+11. **グラフ最適化**: Chart.js廃止、Canvas独自描画でバンドルサイズ67KB削減、レスポンシブ対応
+12. **Focus最適化**: 全PC分のFocus事前生成を廃止、動的表示でメモリ使用量削減
+13. **About画面更新**: モノレポ構成に合わせた情報表示、技術スタック明記
 
 ### フロントエンド
 1. **WebSocket通信**: Socket.IO Client → Native WebSocket API

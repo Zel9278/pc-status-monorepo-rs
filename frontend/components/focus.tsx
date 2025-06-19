@@ -1,38 +1,21 @@
 import { ReactNode, useEffect, useRef, useState, createRef } from "react"
+import Image from "next/image"
 import { ClientData } from "../types/client"
 import { byteToData } from "../Utils/byteToData"
 import selectIcon from "../Utils/selectIcon"
 import { getCPUPercent, getPercent } from "../Utils/getPercent"
+import { formatUptime } from "../Utils/formatUptime"
 import Progressbar from "./ProgressBar"
-import {
-    Chart as ChartJS,
-    CategoryScale,
-    LinearScale,
-    PointElement,
-    LineElement,
-    Title,
-    Tooltip,
-    Legend,
-} from "chart.js"
-import { Line } from "react-chartjs-2"
-
-ChartJS.register(
-    CategoryScale,
-    LinearScale,
-    PointElement,
-    LineElement,
-    Title,
-    Tooltip,
-    Legend
-)
+import CanvasChart from "./CanvasChart"
 
 type Props = {
     children?: ReactNode
     status: ClientData
     pc: string
+    onClose?: () => void
 }
 
-const Focus = ({ children, status, pc }: Props) => {
+const Focus = ({ children, status, pc, onClose }: Props) => {
     const pcStatus = (status || {})[pc]
     const cpuPercent = getCPUPercent(pcStatus.cpu.cpus)
     const ramPercent = getPercent(pcStatus.ram.free, pcStatus.ram.total)
@@ -47,132 +30,106 @@ const Focus = ({ children, status, pc }: Props) => {
             pcStatus.gpu.memory.total
         )
 
-    const graphOptions = {
-        responsive: true,
-        animation: false,
-        scales: {
-            x: {
-                title: {
-                    display: true,
-                    text: "Time",
-                },
-            },
-            y: {
-                beginAtZero: true,
-                title: {
-                    display: true,
-                    text: "Usage",
-                },
-                min: 0,
-                max: 100,
-            },
-        },
+    // Canvas chart configuration
+    const chartConfig = {
+        height: 250,
+        minY: 0,
+        maxY: 100,
+        xAxisLabel: "Time",
+        yAxisLabel: "Usage (%)"
     }
 
+    // CPU chart data
     const cpuHistory = pcStatus.histories.map((history) => history.cpu.cpus)
-    const convertedHistory = cpuHistory[0].map((_, i) => {
-        return cpuHistory.map((history) => history[i].cpu)
-    })
-    const cpuGraph = {
-        labels: cpuHistory.map((_, i) => i),
-        datasets: convertedHistory.map((cpu, i) => {
-            return {
-                label: `Core${i}`,
-                data: cpu,
-                fill: false,
-                borderColor: `hsl(${i * 100}, 100%, 50%)`,
-            }
-        }),
-    }
+    const cpuDatasets = cpuHistory.length > 0 ? cpuHistory[0].map((_, coreIndex) => ({
+        label: `Core${coreIndex}`,
+        data: cpuHistory.map((history) => history[coreIndex]?.cpu || 0),
+        color: `hsl(${coreIndex * 60}, 70%, 50%)`
+    })) : []
 
+    // Memory chart data
     const ramHistory = pcStatus.histories.map((history) => history.ram)
     const swapHistory = pcStatus.histories.map((history) => history.swap)
-    const memoryChart = {
-        labels: ramHistory.map((_, i) => i),
-        datasets: [
-            {
-                label: "RAM",
-                data: ramHistory.map((ram) => getPercent(ram.free, ram.total)),
-                fill: false,
-                borderColor: "rgb(75, 192, 192)",
-            },
-            {
-                label: "Swap",
-                data: swapHistory.map((swap) =>
-                    getPercent(swap.free, swap.total)
-                ),
-                fill: false,
-                borderColor: "rgb(255, 99, 132)",
-            },
-        ],
-    }
+    const memoryDatasets = [
+        {
+            label: "RAM",
+            data: ramHistory.map((ram) => getPercent(ram.free, ram.total)),
+            color: "#10b981"
+        },
+        {
+            label: "Swap",
+            data: swapHistory.map((swap) => getPercent(swap.free, swap.total)),
+            color: "#f59e0b"
+        }
+    ]
 
+    // Storage chart data
     const storageHistory = pcStatus.histories.map((history) => history.storages)
-    const storageGraph = {
-        labels: storageHistory.map((_, i) => i),
-        datasets: storageHistory[0].map((str, i) => {
-            return {
-                label: str.name || `Storage${i}`,
-                data: storageHistory.map(
-                    (storage) =>
-                        getPercent(storage[i].free, storage[i].total) || 0
-                ),
-                fill: false,
-                borderColor: `hsl(${i * 100}, 100%, 50%)`,
-            }
-        }),
-    }
+    const storageDatasets = storageHistory.length > 0 && storageHistory[0].length > 0
+        ? storageHistory[0].map((storage, storageIndex) => ({
+            label: storage.name || `Storage${storageIndex}`,
+            data: storageHistory.map((history) =>
+                history[storageIndex] ? getPercent(history[storageIndex].free, history[storageIndex].total) : 0
+            ),
+            color: `hsl(${storageIndex * 120}, 60%, 50%)`
+        })) : []
 
-    const gpuHistory =
-        pcStatus.gpu && pcStatus.histories.map((history) => history.gpu)
-    const gpuGraph = pcStatus.gpu && {
-        labels: gpuHistory.map((_, i) => i),
-        datasets: [
-            {
-                label: "GPU usage",
-                data: gpuHistory.map((gpu) => gpu.usage),
-                fill: false,
-                borderColor: "rgb(255, 99, 132)",
-            },
-            {
-                label: "GPU memory",
-                data: gpuHistory.map((gpu) =>
-                    getPercent(gpu.memory.free, gpu.memory.total)
-                ),
-                fill: false,
-                borderColor: "rgb(75, 192, 192)",
-            },
-        ],
-    }
+    // GPU chart data
+    const gpuHistory = pcStatus.gpu ? pcStatus.histories.map((history) => history.gpu) : []
+    const gpuDatasets = pcStatus.gpu ? [
+        {
+            label: "GPU Usage",
+            data: gpuHistory.map((gpu) => gpu?.usage || 0),
+            color: "#ef4444"
+        },
+        {
+            label: "GPU Memory",
+            data: gpuHistory.map((gpu) =>
+                gpu ? getPercent(gpu.memory.free, gpu.memory.total) : 0
+            ),
+            color: "#3b82f6"
+        }
+    ] : []
+
+    // ESCキーでFocusを閉じる
+    useEffect(() => {
+        const handleEscape = (event: KeyboardEvent) => {
+            if (event.key === 'Escape' && onClose) {
+                onClose();
+            }
+        };
+
+        document.addEventListener('keydown', handleEscape);
+        return () => {
+            document.removeEventListener('keydown', handleEscape);
+        };
+    }, [onClose]);
 
     return (
-        <>
-            <input
-                type="checkbox"
-                id={`focus-${pcStatus?.hostname}-modal`}
-                className="modal-toggle"
-            />
-            <div className="modal z-50">
-                <div className="modal-box p-0">
-                    <div
-                        id={`${pcStatus?.hostname}-modal-title`}
-                        className="flex justify-between sticky backdrop-blur-sm shadow-lg py-2 px-5 top-0 z-50"
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
+            <div className="bg-base-100 rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+                <div className="flex justify-between sticky backdrop-blur-sm shadow-lg py-2 px-5 top-0 z-50 bg-base-100">
+                    <h2 className="text-lg font-semibold">
+                        Focus - {pcStatus?.hostname}
+                    </h2>
+                    <button
+                        onClick={onClose}
+                        className="btn btn-sm btn-circle border-none w-8 bg-base-50 bg-transparent"
                     >
-                        <label className="bg-transparent border-none">
-                            Focus - {pcStatus?.hostname}
-                        </label>
-                        <label
-                            htmlFor={`focus-${pcStatus?.hostname}-modal`}
-                            className="btn btn-sm btn-circle border-none w-8 bg-base-50 bg-transparent"
-                        >
-                            ✕
-                        </label>
-                    </div>
+                        ✕
+                    </button>
+                </div>
+                <div className="overflow-y-auto max-h-[calc(90vh-60px)]">
                     <div className="statusBody px-6 py-3">
                         <div className="flex items-center">
                             <div className="avatar center">
                                 <div className="w-12">
-                                    <img src={selectIcon(pcStatus?._os)} />
+                                    <Image
+                                        src={selectIcon(pcStatus?._os)}
+                                        alt={`${pcStatus?._os} icon`}
+                                        width={48}
+                                        height={48}
+                                    />
                                 </div>
                             </div>
                             <p className="px-2">{pcStatus._os}</p>
@@ -202,13 +159,10 @@ const Focus = ({ children, status, pc }: Props) => {
                                 )
                             })}
                         </ul>
-                        <Line
-                            width={300}
-                            height={300}
-                            id="cpu-chart"
-                            // @ts-ignore
-                            options={graphOptions}
-                            data={cpuGraph}
+                        <CanvasChart
+                            {...chartConfig}
+                            datasets={cpuDatasets}
+                            title="CPU Usage"
                         />
                         <div className="bg-slate-700 w-full h-0.5 rounded my-2" />
                         <p>
@@ -246,13 +200,10 @@ const Focus = ({ children, status, pc }: Props) => {
                                 </div>
                             </>
                         )}
-                        <Line
-                            width={300}
-                            height={300}
-                            id="ram-chart"
-                            // @ts-ignore
-                            options={graphOptions}
-                            data={memoryChart}
+                        <CanvasChart
+                            {...chartConfig}
+                            datasets={memoryDatasets}
+                            title="Memory Usage"
                         />
                         <div className="bg-slate-700 w-full h-0.5 rounded my-2" />
                         <p>Storages</p>
@@ -290,26 +241,18 @@ const Focus = ({ children, status, pc }: Props) => {
                                 )
                             })}
                         </ul>
-                        <Line
-                            width={300}
-                            height={300}
-                            id="storage-chart"
-                            // @ts-ignore
-                            options={graphOptions}
-                            data={storageGraph}
+                        <CanvasChart
+                            {...chartConfig}
+                            datasets={storageDatasets}
+                            title="Storage Usage"
                         />
                         <div className="bg-slate-700 w-full h-0.5 rounded my-2" />
-                        <p>Uptime: {pcStatus.uptime}</p>
+                        <p>Uptime: {formatUptime(pcStatus.uptime)} (raw: {pcStatus.uptime})</p>
                         {pcStatus?.gpu && (
                             <>
                                 <div className="bg-slate-700 w-full h-0.5 rounded my-2" />
                                 <p>GPU: {pcStatus?.gpu.name}</p>
-                                {/* デバッグログ */}
-                                {console.log('GPU Memory (bytes):', {
-                                    free: pcStatus.gpu.memory.free,
-                                    total: pcStatus.gpu.memory.total,
-                                    used: pcStatus.gpu.memory.total - pcStatus.gpu.memory.free
-                                })}
+
                                 <div className="flex items-center">
                                     <p>GPU:</p>
                                     <Progressbar
@@ -342,13 +285,10 @@ const Focus = ({ children, status, pc }: Props) => {
                                     />{" "}
                                     <p>{Math.floor(gpuMemPercent)}%</p>
                                 </div>
-                                <Line
-                                    width={300}
-                                    height={300}
-                                    id="gpu-chart"
-                                    // @ts-ignore
-                                    options={graphOptions}
-                                    data={gpuGraph}
+                                <CanvasChart
+                                    {...chartConfig}
+                                    datasets={gpuDatasets}
+                                    title="GPU Usage"
                                 />
                             </>
                         )}
@@ -407,7 +347,7 @@ const Focus = ({ children, status, pc }: Props) => {
                     </div>
                 </div>
             </div>
-        </>
+        </div>
     )
 }
 

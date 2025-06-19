@@ -56,6 +56,12 @@ sudo cp *.env.example /opt/pc-status/
 sudo cp *.service /opt/pc-status/  # systemd service files
 sudo chmod +x /opt/pc-status/server /opt/pc-status/client
 
+# Place frontend files (optional)
+# For integrated frontend serving
+sudo mkdir -p /opt/pc-status/frontend
+# Copy frontend build artifacts
+# sudo cp -r /path/to/frontend/out/* /opt/pc-status/frontend/
+
 # Create symbolic links (optional)
 sudo ln -s /opt/pc-status/server /usr/local/bin/pc-status-server
 sudo ln -s /opt/pc-status/client /usr/local/bin/pc-status-client
@@ -70,6 +76,12 @@ Expand-Archive -Path pc-status-backend-windows-x64.zip -DestinationPath C:\pc-st
 # Consolidate binaries
 Copy-Item C:\pc-status\client\client.exe C:\pc-status\
 Copy-Item C:\pc-status\server\server.exe C:\pc-status\
+
+# Place frontend files (optional)
+# For integrated frontend serving
+New-Item -ItemType Directory -Path C:\pc-status\frontend -Force
+# Copy frontend build artifacts
+# Copy-Item -Recurse /path/to/frontend/out/* C:\pc-status\frontend\
 
 # Add to PATH environment variable (optional)
 $env:PATH += ";C:\pc-status"

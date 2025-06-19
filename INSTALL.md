@@ -56,6 +56,12 @@ sudo cp *.env.example /opt/pc-status/
 sudo cp *.service /opt/pc-status/  # systemdサービスファイル
 sudo chmod +x /opt/pc-status/server /opt/pc-status/client
 
+# フロントエンドファイルを配置（オプション）
+# フロントエンドを統合配信したい場合
+sudo mkdir -p /opt/pc-status/frontend
+# フロントエンドのビルド成果物をコピー
+# sudo cp -r /path/to/frontend/out/* /opt/pc-status/frontend/
+
 # シンボリックリンクを作成（オプション）
 sudo ln -s /opt/pc-status/server /usr/local/bin/pc-status-server
 sudo ln -s /opt/pc-status/client /usr/local/bin/pc-status-client
@@ -70,6 +76,12 @@ Expand-Archive -Path pc-status-backend-windows-x64.zip -DestinationPath C:\pc-st
 # バイナリを統合
 Copy-Item C:\pc-status\client\client.exe C:\pc-status\
 Copy-Item C:\pc-status\server\server.exe C:\pc-status\
+
+# フロントエンドファイルを配置（オプション）
+# フロントエンドを統合配信したい場合
+New-Item -ItemType Directory -Path C:\pc-status\frontend -Force
+# フロントエンドのビルド成果物をコピー
+# Copy-Item -Recurse /path/to/frontend/out/* C:\pc-status\frontend\
 
 # 環境変数PATHに追加（オプション）
 $env:PATH += ";C:\pc-status"

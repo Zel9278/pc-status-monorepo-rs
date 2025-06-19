@@ -56,9 +56,32 @@ cargo run --bin server
 ```
 
 The server provides the following endpoints:
-- `http://localhost:3000/` - Root endpoint
+- `http://localhost:3000/` - Root endpoint (frontend serving)
 - `ws://localhost:3000/ws` - WebSocket connection
 - `ws://localhost:3000/server` - Server WebSocket connection
+
+#### Integrated Frontend Serving
+
+The server automatically serves frontend static files. It searches for directories in the following priority order:
+
+1. `./frontend` - Same directory as binary
+2. `./out` - Same directory as binary
+3. `./www` - Same directory as binary
+4. `./static` - Same directory as binary
+5. `./frontend/out` - For development
+
+**Production usage example:**
+```bash
+# Build frontend
+cd frontend
+pnpm run export
+
+# Copy build artifacts to server binary location
+cp -r out /path/to/server/frontend
+
+# Start server (automatically serves frontend)
+/path/to/server/server
+```
 
 ### Starting the Client
 
@@ -205,6 +228,10 @@ When you push a release tag (`v*`), client and backend are built separately and 
 7. **HTTP Routing**: Axum 0.8 compatibility (nest → fallback_service)
 8. **OS Detection**: Field name unification (os → _os) and icon display fix
 9. **GPU Display**: Fixed double unit conversion (PB notation → proper GB notation)
+10. **Uptime Display**: Fixed raw seconds to readable format (e.g., "1d 2h 30m 45s")
+11. **Chart Optimization**: Replaced Chart.js with custom Canvas rendering, reduced bundle size by 67KB, responsive design
+12. **Focus Optimization**: Eliminated pre-generation of all PC Focus components, dynamic rendering reduces memory usage
+13. **About Screen Update**: Updated information to reflect monorepo structure, detailed tech stack
 
 ### Frontend
 1. **WebSocket Communication**: Socket.IO Client → Native WebSocket API

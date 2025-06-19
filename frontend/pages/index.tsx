@@ -14,6 +14,7 @@ export default function Home() {
     const [loading, setLoading] = useState<boolean>(false)
     const [isDark, setDark] = useState<boolean>(true)
     const [searchIndex, setSearch] = useState<string>()
+    const [activeFocus, setActiveFocus] = useState<string | null>(null)
     const { isReady } = useRouter()
 
     // WebSocketフックを使用
@@ -232,7 +233,11 @@ export default function Home() {
                         )
                         .map((pc) => (
                             <li key={pc}>
-                                <Status status={status || {}} pc={pc} />
+                                <Status
+                                    status={status || {}}
+                                    pc={pc}
+                                    onFocusClick={() => setActiveFocus(pc)}
+                                />
                             </li>
                         ))}
                 </ul>
@@ -252,95 +257,67 @@ export default function Home() {
                             ✕
                         </label>
                     </div>
-                    <div>
-                        <p>
-                            PC Status is a site created by{" "}
-                            <a
-                                href="https://csys64.com"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="link"
-                            >
-                                csys64
-                            </a>
-                        </p>
+                    <div className="space-y-4">
+                        <div>
+                            <h3 className="text-lg font-semibold mb-2">PC Status Monitor</h3>
+                            <p className="text-sm text-gray-600">
+                                A real-time PC monitoring system built with Rust and Next.js
+                            </p>
+                        </div>
 
-                        <p>
-                            Repository:{" "}
+                        <div>
+                            <h4 className="font-semibold mb-2">Repository</h4>
                             <a
-                                href="https://github.com/eoeo-org/pcsc-rs"
+                                href="https://github.com/Zel9278/pc-status-monorepo-rs"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="link"
+                                className="link link-primary"
                             >
-                                Client
-                            </a>{" "}
-                            <a
-                                href="https://github.com/Zel9278/pc-status-server"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="link"
-                            >
-                                Frontend
-                            </a>{" "}
-                            <a
-                                href="https://github.com/Zel9278/pc-status-server-backend"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="link"
-                            >
-                                Backend
+                                📦 pc-status-monorepo-rs
                             </a>
-                        </p>
-                        <p>
-                            CSS:{" "}
-                            <a
-                                href="https://tailwindcss.com/"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="link"
-                            >
-                                TailwindCSS
-                            </a>{" "}
-                            <a
-                                href="https://daisyui.com/"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="link"
-                            >
-                                daisyUI
-                            </a>
-                        </p>
+                            <p className="text-xs text-gray-500 mt-1">
+                                Unified monorepo containing server, client, and frontend
+                            </p>
+                        </div>
 
-                        <br />
+                        <div>
+                            <h4 className="font-semibold mb-2">Architecture</h4>
+                            <ul className="text-sm space-y-1">
+                                <li>🦀 <strong>Server:</strong> Rust + fastwebsockets + rustls</li>
+                                <li>📊 <strong>Client:</strong> Rust + sysinfo + tokio</li>
+                                <li>🌐 <strong>Frontend:</strong> Next.js + TypeScript + Canvas</li>
+                                <li>🎨 <strong>UI:</strong> TailwindCSS + daisyUI</li>
+                            </ul>
+                        </div>
 
-                        <p>
-                            Rendered With{" "}
-                            <a
-                                href="https://nextjs.org/"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="link"
-                            >
-                                Next.js
-                            </a>
-                        </p>
+                        <div>
+                            <h4 className="font-semibold mb-2">Features</h4>
+                            <ul className="text-sm space-y-1">
+                                <li>⚡ Real-time system monitoring</li>
+                                <li>📈 Custom Canvas charts (Chart.js-free)</li>
+                                <li>🔒 Secure WebSocket communication</li>
+                                <li>📱 Responsive design</li>
+                                <li>🎯 GPU monitoring support</li>
+                            </ul>
+                        </div>
+
+                        <div className="pt-2 border-t">
+                            <p className="text-xs text-gray-500">
+                                Built with ❤️ using modern web technologies
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            {Object.keys(status || {})
-                .filter((pc) =>
-                    (status || {})[pc]?.hostname.includes(searchIndex || "")
-                )
-                .sort(
-                    (pc, opc) =>
-                        Number(Boolean((status || {})[pc]?.gpu)) -
-                        Number(Boolean((status || {})[opc]?.gpu))
-                )
-                .map((pc) => (
-                    <Focus status={status || {}} pc={pc} key={pc} />
-                ))}
+            {/* 動的Focus表示 */}
+            {activeFocus && status && status[activeFocus] && (
+                <Focus
+                    status={status}
+                    pc={activeFocus}
+                    onClose={() => setActiveFocus(null)}
+                />
+            )}
         </>
     )
 }
