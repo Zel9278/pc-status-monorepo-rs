@@ -19,9 +19,9 @@ pub fn create_http_server(ws_server: WebSocketServer) -> Router {
     Router::new()
         .route("/ws", get(WebSocketServer::handle_websocket_upgrade))
         .route("/server", get(WebSocketServer::handle_websocket_upgrade))
-        .nest_service("/", ServeDir::new("frontend/dist").fallback(ServeDir::new("frontend/dist/index.html")))
         .with_state(ws_server)
         .layer(ServiceBuilder::new().layer(cors))
+        .fallback_service(ServeDir::new("frontend/dist").fallback(ServeDir::new("frontend/dist/index.html")))
 }
 
 

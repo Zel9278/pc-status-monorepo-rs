@@ -80,7 +80,7 @@ pnpm run dev
 #### GitHub Pages
 フロントエンドはGitHub Pagesで自動デプロイされます：
 - **URL**: https://your-username.github.io/pc-status-monorepo-rs/
-- **自動デプロイ**: mainブランチのfrontend/配下の変更時
+- **自動デプロイ**: mainブランチのfrontend/配下の変更時（nextjs.ymlワークフロー）
 - **WebSocket接続**: デフォルトで公式サーバー（wss://pcss.eov2.com/ws）に接続
 
 ## API仕様
@@ -147,12 +147,31 @@ RUST_LOG=debug cargo run --bin server
 
 ### CI/CD
 
-GitHub Actionsを使用して以下のプラットフォーム向けに自動ビルドを行います：
+GitHub Actionsを使用して以下の自動化を行います：
+
+#### ワークフロー
+
+1. **build.yml** - Rustバイナリのビルドとリリース
+   - 4つのプラットフォーム向けビルド
+   - クライアントとバックエンドを分離
+   - リリースタグ時の自動リリース作成
+
+2. **frontend.yml** - フロントエンドのテストとリンティング
+   - pnpmを使用した依存関係管理
+   - ESLintとTypeScriptチェック
+
+3. **nextjs.yml** - GitHub Pagesへの自動デプロイ
+   - mainブランチのfrontend/変更時にトリガー
+   - 静的サイト生成とデプロイ
+
+#### ビルドターゲット
 
 - **Apple ARM64** (aarch64-apple-darwin) - macOS M1/M2
 - **Windows x64** (x86_64-pc-windows-msvc) - Windows 64-bit
 - **Linux x64** (x86_64-unknown-linux-musl) - Linux 64-bit
 - **Linux ARM64** (aarch64-unknown-linux-musl) - Linux ARM 64-bit
+
+#### リリース成果物
 
 リリースタグ（`v*`）をプッシュすると、クライアントとバックエンドが別々にビルドされ、GitHubリリースに添付されます：
 
@@ -168,6 +187,7 @@ GitHub Actionsを使用して以下のプラットフォーム向けに自動ビ
 4. **型安全性**: Rustの型システムによる強化
 5. **パフォーマンス**: Rustによる高速化
 6. **TLSライブラリ**: OpenSSL → rustls（純粋Rust実装）
+7. **HTTPルーティング**: Axum 0.8対応（nest → fallback_service）
 
 ### フロントエンド
 1. **WebSocket通信**: Socket.IO Client → Native WebSocket API

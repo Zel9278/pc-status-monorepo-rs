@@ -80,7 +80,7 @@ The frontend starts at http://localhost:3000 (Next.js default port).
 #### GitHub Pages
 The frontend is automatically deployed to GitHub Pages:
 - **URL**: https://your-username.github.io/pc-status-monorepo-rs/
-- **Auto-deploy**: On changes to frontend/ in main branch
+- **Auto-deploy**: On changes to frontend/ in main branch (nextjs.yml workflow)
 - **WebSocket connection**: Connects to official server (wss://pcss.eov2.com/ws) by default
 
 ## API Specification
@@ -147,12 +147,31 @@ RUST_LOG=debug cargo run --bin server
 
 ### CI/CD
 
-GitHub Actions automatically builds for the following platforms:
+GitHub Actions provides the following automation:
+
+#### Workflows
+
+1. **build.yml** - Rust binary builds and releases
+   - Multi-platform builds for 4 targets
+   - Separate client and backend artifacts
+   - Automatic release creation on tags
+
+2. **frontend.yml** - Frontend testing and linting
+   - pnpm dependency management
+   - ESLint and TypeScript checks
+
+3. **nextjs.yml** - Automatic GitHub Pages deployment
+   - Triggered on frontend/ changes in main branch
+   - Static site generation and deployment
+
+#### Build Targets
 
 - **Apple ARM64** (aarch64-apple-darwin) - macOS M1/M2
 - **Windows x64** (x86_64-pc-windows-msvc) - Windows 64-bit
 - **Linux x64** (x86_64-unknown-linux-musl) - Linux 64-bit
 - **Linux ARM64** (aarch64-unknown-linux-musl) - Linux ARM 64-bit
+
+#### Release Artifacts
 
 When you push a release tag (`v*`), client and backend are built separately and attached to the GitHub release:
 
@@ -168,6 +187,7 @@ When you push a release tag (`v*`), client and backend are built separately and 
 4. **Type Safety**: Enhanced with Rust's type system
 5. **Performance**: Improved with Rust
 6. **TLS Library**: OpenSSL → rustls (pure Rust implementation)
+7. **HTTP Routing**: Axum 0.8 compatibility (nest → fallback_service)
 
 ### Frontend
 1. **WebSocket Communication**: Socket.IO Client → Native WebSocket API
