@@ -40,9 +40,11 @@ export const useWebSocket = (url: string): UseWebSocketReturn => {
                 wsUrl = customUrl
                 console.log('Using custom WebSocket URL from env:', wsUrl)
             } else if (process.env.NODE_ENV === 'production') {
-                // GitHub Pages環境ではデフォルトサーバーを使用
-                wsUrl = 'wss://pcss.eov2.com/ws'
-                console.log('Using default production WebSocket URL:', wsUrl)
+                // 本番環境では現在のホストのWebSocketサーバーに接続
+                const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+                const host = window.location.host
+                wsUrl = `${protocol}//${host}/server`
+                console.log('Using production WebSocket URL:', wsUrl)
             } else {
                 // 開発環境ではローカルサーバーに接続
                 const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
@@ -73,7 +75,19 @@ export const useWebSocket = (url: string): UseWebSocketReturn => {
                             console.log('Server greeting:', data.data)
                             break
                         case 'Status':
-                            setStatus(data.data)
+                            // データが配列の場合は最初の要素を使用、オブジェクトの場合はそのまま使用
+                            if (Array.isArray(data.data)) {
+                                if (data.data.length > 0) {
+                                    setStatus(data.data[0])
+                                } else {
+                                    setStatus({})
+                                }
+                            } else if (data.data && typeof data.data === 'object') {
+                                setStatus(data.data)
+                            } else {
+                                console.warn('Unexpected status data format:', data.data)
+                                setStatus({})
+                            }
                             break
                         case 'Toast':
                             // トーストメッセージをカスタムイベントとして発火
@@ -94,6 +108,7 @@ export const useWebSocket = (url: string): UseWebSocketReturn => {
                     }
                 } catch (err) {
                     console.error('Error parsing WebSocket message:', err)
+                    console.error('Raw message:', event.data)
                 }
             }
 

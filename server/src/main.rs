@@ -6,7 +6,7 @@ use anyhow::Result;
 use dotenvy::dotenv;
 use std::env;
 use tokio::net::TcpListener;
-use tracing::info;
+use tracing::{debug, info, warn};
 use tracing_subscriber;
 
 use crate::websocket::WebSocketServer;
@@ -48,8 +48,11 @@ async fn main() -> Result<()> {
             // すべてのクライアントデータを取得してブロードキャスト
             let clients = client_manager_clone.get_all_clients().await;
             if !clients.is_empty() {
-                info!("Broadcasting status data for {} clients", clients.len());
-                let _ = broadcast_sender.send(pc_status_shared::ServerMessage::Status(clients));
+                debug!("Broadcasting status data for {} clients", clients.len());
+                let message = pc_status_shared::ServerMessage::Status(clients);
+                if let Err(e) = broadcast_sender.send(message) {
+                    warn!("Failed to broadcast status: {}", e);
+                }
             }
         }
     });
