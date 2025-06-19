@@ -23,6 +23,7 @@ This monorepo consists of the following components:
 - Historical data management (up to 10 entries)
 - Periodic data broadcasting
 - CORS support
+- Secure TLS communication using rustls
 
 ### Client Features
 - System information collection (CPU, memory, disk, GPU, etc.)
@@ -33,6 +34,7 @@ This monorepo consists of the following components:
 - Environment variable configuration
 - Custom hostname setting
 - Development mode support (allows duplicate hostnames)
+- Secure TLS communication using rustls
 
 ## Installation
 
@@ -162,6 +164,7 @@ When you push a release tag (`v*`), binaries for all platforms are automatically
 3. **Architecture**: Adopted monorepo structure
 4. **Type Safety**: Enhanced with Rust's type system
 5. **Performance**: Improved with Rust
+6. **TLS Library**: OpenSSL → rustls (pure Rust implementation)
 
 ### Frontend
 1. **WebSocket Communication**: Socket.IO Client → Native WebSocket API

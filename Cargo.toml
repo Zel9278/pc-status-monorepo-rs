@@ -10,13 +10,14 @@ resolver = "2"
 # WebSocket関連
 fastwebsockets = "0.10.0"
 tokio = { version = "1.45.1", features = ["full"] }
-tokio-tungstenite = "0.27.0"
+tokio-tungstenite = { version = "0.27.0", default-features = false, features = ["connect", "rustls-tls-webpki-roots"] }
 
 # HTTP関連
 axum = { version = "0.8.4", features = ["ws"] }
 tower = "0.5.2"
 tower-http = { version = "0.6.6", features = ["cors"] }
-hyper = "1.6.0"
+hyper = { version = "1.6.0", features = ["http1", "http2"] }
+hyper-rustls = "0.27.0"
 
 # シリアライゼーション
 serde = { version = "1.0.219", features = ["derive"] }
@@ -48,7 +49,11 @@ chrono = { version = "0.4.41", features = ["serde"] }
 sysinfo = { version = "0.35.2", default-features = false, features = ["disk", "multithread", "system"] }
 
 # ネットワーク
-reqwest = { version = "0.12.20", features = ["json"] }
+reqwest = { version = "0.12.20", default-features = false, features = ["json", "rustls-tls"] }
+
+# TLS関連
+rustls = "0.23.0"
+webpki-roots = "0.26.0"
 
 [profile.release]
 strip = "symbols"

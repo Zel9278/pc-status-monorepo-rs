@@ -20,6 +20,7 @@ axum = { workspace = true, features = ["ws"] }
 tower = { workspace = true }
 tower-http = { workspace = true, features = ["fs"] }
 hyper = { workspace = true }
+hyper-rustls = { workspace = true }
 
 # シリアライゼーション
 serde = { workspace = true }
@@ -45,3 +46,7 @@ uuid = { workspace = true }
 
 # 時間処理
 chrono = { workspace = true }
+
+# TLS関連
+rustls = { workspace = true }
+webpki-roots = { workspace = true }

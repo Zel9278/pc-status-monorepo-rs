@@ -23,6 +23,7 @@ TypeScriptのSocket.IOベースのPC Status MonitorをRustのfastwebsocketsに�
 - 履歴データの管理（最大10件）
 - 定期的なデータブロードキャスト
 - CORS対応
+- rustls使用による安全なTLS通信
 
 ### クライアント機能
 - システム情報の収集（CPU、メモリ、ディスク、GPU等）
@@ -33,6 +34,7 @@ TypeScriptのSocket.IOベースのPC Status MonitorをRustのfastwebsocketsに�
 - 環境変数による設定
 - カスタムホスト名設定
 - 開発モード対応（重複ホスト名許可）
+- rustls使用による安全なTLS通信
 
 ## インストール
 
@@ -162,6 +164,7 @@ GitHub Actionsを使用して以下のプラットフォーム向けに自動ビ
 3. **アーキテクチャ**: monorepo構造の採用
 4. **型安全性**: Rustの型システムによる強化
 5. **パフォーマンス**: Rustによる高速化
+6. **TLSライブラリ**: OpenSSL → rustls（純粋Rust実装）
 
 ### フロントエンド
 1. **WebSocket通信**: Socket.IO Client → Native WebSocket API
