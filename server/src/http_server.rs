@@ -21,7 +21,7 @@ pub fn create_http_server(ws_server: WebSocketServer) -> Router {
         .route("/server", get(WebSocketServer::handle_websocket_upgrade))
         .with_state(ws_server)
         .layer(ServiceBuilder::new().layer(cors))
-        .fallback_service(ServeDir::new("frontend/dist").fallback(ServeDir::new("frontend/dist/index.html")))
+        .fallback_service(ServeDir::new("frontend/out").fallback(ServeDir::new("frontend/out/index.html")))
 }
 
 

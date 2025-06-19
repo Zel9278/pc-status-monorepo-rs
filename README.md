@@ -152,6 +152,35 @@ RUST_LOG=debug cargo run --bin client
 - サーバー → フロントエンド: ブロードキャスト（1秒間隔）
 - フロントエンド: リアルタイム表示
 
+#### 開発フロー
+
+**フロントエンド単体テスト:**
+```bash
+cd frontend
+pnpm run export                    # 静的ファイル生成
+pnpm dlx serve -p 3000 out        # 静的サーバー起動
+```
+
+**統合テスト（推奨）:**
+```bash
+# ターミナル1: サーバー起動
+cargo run --bin server
+
+# ターミナル2: クライアント起動
+cargo run --bin client
+
+# ターミナル3: フロントエンド配信
+cd frontend
+pnpm run export
+pnpm dlx serve -p 8080 out
+```
+
+**開発時（ホットリロード）:**
+```bash
+cd frontend
+pnpm dev                          # 開発サーバー起動
+```
+
 ## API仕様
 
 ### WebSocketメッセージ

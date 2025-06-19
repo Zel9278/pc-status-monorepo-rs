@@ -8,6 +8,7 @@ console.log('Next.js Config Environment:', {
 });
 
 const isStaticExport = !!(process.env.CI || process.env.NODE_ENV === 'production');
+const isGitHubPages = process.env.CI; // GitHub Pages deployment
 
 const nextConfig = {
     reactStrictMode: true,
@@ -15,8 +16,11 @@ const nextConfig = {
     ...(isStaticExport && {
         output: 'export',
         trailingSlash: true,
-        assetPrefix: '/pc-status-monorepo-rs',
-        basePath: '/pc-status-monorepo-rs',
+        // Only use basePath for GitHub Pages, not local production builds
+        ...(isGitHubPages && {
+            assetPrefix: '/pc-status-monorepo-rs',
+            basePath: '/pc-status-monorepo-rs',
+        }),
     }),
     images: {
         unoptimized: true
