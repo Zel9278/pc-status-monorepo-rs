@@ -125,16 +125,19 @@ const Status = ({ children, status, pc, onFocusClick }: Props) => {
                         <div className="stat-figure text-secondary"></div>
                         <div className="stat-title">GPU</div>
                         <div className="stat-value">
-                            {(status || {})[pc]?.gpu ? (
-                                <>{(status || {})[pc]?.gpu.usage}%</>
+                            {(status || {})[pc]?.gpus && (status || {})[pc]?.gpus.length > 0 ? (
+                                <>
+                                    {Math.floor((status || {})[pc]?.gpus.reduce((sum, gpu) => sum + gpu.usage, 0) / (status || {})[pc]?.gpus.length)}%
+                                    <span className="text-sm ml-1">({(status || {})[pc]?.gpus.length})</span>
+                                </>
                             ) : (
                                 <>NaN%</>
                             )}
                         </div>
                         <div className="stat-desc">
-                            {(status || {})[pc]?.gpu ? (
+                            {(status || {})[pc]?.gpus && (status || {})[pc]?.gpus.length > 0 ? (
                                 <Progressbar
-                                    value={(status || {})[pc]?.gpu.usage}
+                                    value={(status || {})[pc]?.gpus.reduce((sum, gpu) => sum + gpu.usage, 0) / (status || {})[pc]?.gpus.length}
                                     className="w-20 mx-auto my-0"
                                 />
                             ) : (

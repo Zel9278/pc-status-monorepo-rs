@@ -23,12 +23,11 @@ const Focus = ({ children, status, pc, onClose }: Props) => {
     if (pcStatus.swap)
         swapPercent = getPercent(pcStatus.swap.free, pcStatus.swap.total)
     const storages = pcStatus.storages
-    let gpuMemPercent = 0
-    if (pcStatus.gpu)
-        gpuMemPercent = getPercent(
-            pcStatus.gpu.memory.free,
-            pcStatus.gpu.memory.total
-        )
+
+    // GPU memory percentages for each GPU
+    const gpuMemPercents = pcStatus.gpus?.map(gpu =>
+        getPercent(gpu.memory.free, gpu.memory.total)
+    ) || []
 
     // Canvas chart configuration
     const chartConfig = {
@@ -74,22 +73,28 @@ const Focus = ({ children, status, pc, onClose }: Props) => {
             color: `hsl(${storageIndex * 120}, 60%, 50%)`
         })) : []
 
-    // GPU chart data
-    const gpuHistory = pcStatus.gpu ? pcStatus.histories.map((history) => history.gpu) : []
-    const gpuDatasets = pcStatus.gpu ? [
-        {
-            label: "GPU Usage",
-            data: gpuHistory.map((gpu) => gpu?.usage || 0),
-            color: "#ef4444"
-        },
-        {
-            label: "GPU Memory",
-            data: gpuHistory.map((gpu) =>
-                gpu ? getPercent(gpu.memory.free, gpu.memory.total) : 0
-            ),
-            color: "#3b82f6"
-        }
-    ] : []
+    // GPU chart data for multiple GPUs
+    const gpuDatasets = pcStatus.gpus && pcStatus.gpus.length > 0 ?
+        pcStatus.gpus.flatMap((gpu, gpuIndex) => {
+            const gpuHistory = pcStatus.histories.map((history) =>
+                history.gpus && history.gpus[gpuIndex] ? history.gpus[gpuIndex] : null
+            )
+
+            return [
+                {
+                    label: `${gpu.name} Usage`,
+                    data: gpuHistory.map((historyGpu) => historyGpu?.usage || 0),
+                    color: `hsl(${gpuIndex * 60}, 70%, 50%)`
+                },
+                {
+                    label: `${gpu.name} Memory`,
+                    data: gpuHistory.map((historyGpu) =>
+                        historyGpu ? getPercent(historyGpu.memory.free, historyGpu.memory.total) : 0
+                    ),
+                    color: `hsl(${gpuIndex * 60 + 30}, 70%, 60%)`
+                }
+            ]
+        }) : []
 
     // ESCキーでFocusを閉じる
     useEffect(() => {
@@ -248,43 +253,51 @@ const Focus = ({ children, status, pc, onClose }: Props) => {
                         />
                         <div className="bg-slate-700 w-full h-0.5 rounded my-2" />
                         <p>Uptime: {formatUptime(pcStatus.uptime)} (raw: {pcStatus.uptime})</p>
-                        {pcStatus?.gpu && (
+                        {pcStatus?.gpus && pcStatus.gpus.length > 0 && (
                             <>
                                 <div className="bg-slate-700 w-full h-0.5 rounded my-2" />
-                                <p>GPU: {pcStatus?.gpu.name}</p>
+                                <p>GPUs ({pcStatus.gpus.length} detected):</p>
 
-                                <div className="flex items-center">
-                                    <p>GPU:</p>
-                                    <Progressbar
-                                        value={pcStatus.gpu.usage}
-                                        className="w-full mx-3"
-                                    />{" "}
-                                    <p>{Math.floor(pcStatus.gpu.usage)}%</p>
-                                </div>
-                                <p>
-                                    VRAM:{" "}
-                                    {byteToData(
-                                        pcStatus?.gpu.memory.total -
-                                            pcStatus?.gpu.memory.free
-                                    )}
-                                    /
-                                    {byteToData(
-                                        pcStatus?.gpu.memory.total
-                                    )}{" "}
-                                    |{" "}
-                                    {byteToData(
-                                        pcStatus?.gpu.memory.free
-                                    )}{" "}
-                                    free
-                                </p>
-                                <div className="flex items-center">
-                                    <p>VRAM:</p>
-                                    <Progressbar
-                                        value={gpuMemPercent}
-                                        className="w-full mx-3"
-                                    />{" "}
-                                    <p>{Math.floor(gpuMemPercent)}%</p>
-                                </div>
+                                {pcStatus.gpus.map((gpu, index) => (
+                                    <div key={index} className="mb-4">
+                                        <p className="font-semibold">GPU {index + 1}: {gpu.name}</p>
+
+                                        <div className="flex items-center">
+                                            <p>Usage:</p>
+                                            <Progressbar
+                                                value={gpu.usage}
+                                                className="w-full mx-3"
+                                            />{" "}
+                                            <p>{Math.floor(gpu.usage)}%</p>
+                                        </div>
+
+                                        <p>
+                                            VRAM:{" "}
+                                            {byteToData(
+                                                gpu.memory.total - gpu.memory.free
+                                            )}
+                                            /
+                                            {byteToData(gpu.memory.total)}{" "}
+                                            |{" "}
+                                            {byteToData(gpu.memory.free)}{" "}
+                                            free
+                                        </p>
+
+                                        <div className="flex items-center">
+                                            <p>VRAM:</p>
+                                            <Progressbar
+                                                value={gpuMemPercents[index] || 0}
+                                                className="w-full mx-3"
+                                            />{" "}
+                                            <p>{Math.floor(gpuMemPercents[index] || 0)}%</p>
+                                        </div>
+
+                                        {index < pcStatus.gpus.length - 1 && (
+                                            <div className="bg-slate-600 w-full h-0.5 rounded my-2" />
+                                        )}
+                                    </div>
+                                ))}
+
                                 <CanvasChart
                                     {...chartConfig}
                                     datasets={gpuDatasets}

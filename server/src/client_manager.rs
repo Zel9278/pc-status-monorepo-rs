@@ -23,7 +23,7 @@ impl ClientManager {
             ram: status_data.ram.clone(),
             swap: status_data.swap.clone(),
             storages: status_data.storages.clone(),
-            gpu: status_data.gpu.clone(),
+            gpus: status_data.gpus.clone(),
             uptime: status_data.uptime,
         };
         status_data.histories = vec![history];
@@ -71,7 +71,7 @@ impl ClientManager {
                 ram: status_data.ram.clone(),
                 swap: status_data.swap.clone(),
                 storages: status_data.storages.clone(),
-                gpu: status_data.gpu.clone(),
+                gpus: status_data.gpus.clone(),
                 uptime: status_data.uptime,
             };
 
@@ -86,7 +86,7 @@ impl ClientManager {
             existing_client.ram = status_data.ram;
             existing_client.swap = status_data.swap;
             existing_client.storages = status_data.storages;
-            existing_client.gpu = status_data.gpu;
+            existing_client.gpus = status_data.gpus;
             existing_client.uptime = status_data.uptime;
             existing_client.loadavg = status_data.loadavg;
             existing_client.hostname = status_data.hostname;

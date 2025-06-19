@@ -29,7 +29,7 @@ mod tests {
             }],
             uptime: 3600,
             loadavg: [1.0, 1.5, 2.0],
-            gpu: None,
+            gpus: vec![],
             index: 0,
             histories: vec![],
         };
@@ -59,7 +59,7 @@ mod tests {
                 storages: vec![],
                 uptime: 7200,
                 loadavg: [0.5, 0.7, 0.9],
-                gpu: None,
+                gpus: vec![],
                 index: 0,
                 histories: vec![],
             },

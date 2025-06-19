@@ -98,7 +98,7 @@ impl SystemInfoCollector {
             .collect();
 
         // GPU情報
-        let gpu = gpu::get_info();
+        let gpus = gpu::get_info();
 
         Ok(StatusData {
             pass: None, // パスワードは後で設定
@@ -112,7 +112,7 @@ impl SystemInfoCollector {
             storages,
             uptime,
             loadavg,
-            gpu,
+            gpus,
             index: 0,
             histories: vec![],
         })

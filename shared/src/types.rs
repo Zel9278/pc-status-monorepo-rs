@@ -57,7 +57,7 @@ pub struct HistoriesData {
     pub ram: Ram,
     pub swap: Swap,
     pub storages: Vec<Storage>,
-    pub gpu: Option<Gpu>,
+    pub gpus: Vec<Gpu>,
     pub uptime: u64,
 }
 
@@ -75,7 +75,7 @@ pub struct StatusData {
     pub storages: Vec<Storage>,
     pub uptime: u64,
     pub loadavg: [f64; 3],
-    pub gpu: Option<Gpu>,
+    pub gpus: Vec<Gpu>,
     pub index: u32,
     pub histories: Vec<HistoriesData>,
 }

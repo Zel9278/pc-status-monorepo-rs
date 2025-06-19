@@ -139,11 +139,11 @@ export default function Home() {
                                     .sort(
                                         (pc, opc) =>
                                             Number(
-                                                Boolean((status || {})[pc]?.gpu)
+                                                Boolean((status || {})[pc]?.gpus && (status || {})[pc]?.gpus.length > 0)
                                             ) -
                                             Number(
                                                 Boolean(
-                                                    (status || {})[opc]?.gpu
+                                                    (status || {})[opc]?.gpus && (status || {})[opc]?.gpus.length > 0
                                                 )
                                             )
                                     )
@@ -228,8 +228,8 @@ export default function Home() {
                         )
                         .sort(
                             (pc, opc) =>
-                                Number(Boolean((status || {})[pc]?.gpu)) -
-                                Number(Boolean((status || {})[opc]?.gpu))
+                                Number(Boolean((status || {})[pc]?.gpus && (status || {})[pc]?.gpus.length > 0)) -
+                                Number(Boolean((status || {})[opc]?.gpus && (status || {})[opc]?.gpus.length > 0))
                         )
                         .map((pc) => (
                             <li key={pc}>
@@ -297,7 +297,7 @@ export default function Home() {
                                 <li>📈 Custom Canvas charts (Chart.js-free)</li>
                                 <li>🔒 Secure WebSocket communication</li>
                                 <li>📱 Responsive design</li>
-                                <li>🎯 GPU monitoring support</li>
+                                <li>🎯 Multi-GPU monitoring support (Intel/AMD/NVIDIA)</li>
                             </ul>
                         </div>
 

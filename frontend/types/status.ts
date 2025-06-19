@@ -42,7 +42,7 @@ interface HistoriesData {
     ram: RAM
     swap: Swap
     storages: Storage[]
-    gpu: GPU
+    gpus: GPU[]
     uptime: number
 }
 
@@ -56,7 +56,7 @@ export interface StatusData {
     storages: Storage[]
     uptime: number
     loadavg: number[]
-    gpu: GPU
+    gpus: GPU[]
     networks: NetWorkData[]
     histories: HistoriesData[]
 }
