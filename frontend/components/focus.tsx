@@ -304,6 +304,12 @@ const Focus = ({ children, status, pc }: Props) => {
                             <>
                                 <div className="bg-slate-700 w-full h-0.5 rounded my-2" />
                                 <p>GPU: {pcStatus?.gpu.name}</p>
+                                {/* デバッグログ */}
+                                {console.log('GPU Memory (bytes):', {
+                                    free: pcStatus.gpu.memory.free,
+                                    total: pcStatus.gpu.memory.total,
+                                    used: pcStatus.gpu.memory.total - pcStatus.gpu.memory.free
+                                })}
                                 <div className="flex items-center">
                                     <p>GPU:</p>
                                     <Progressbar
@@ -315,18 +321,16 @@ const Focus = ({ children, status, pc }: Props) => {
                                 <p>
                                     VRAM:{" "}
                                     {byteToData(
-                                        (pcStatus?.gpu.memory.total -
-                                            pcStatus?.gpu.memory.free) *
-                                            1024 *
-                                            1024
+                                        pcStatus?.gpu.memory.total -
+                                            pcStatus?.gpu.memory.free
                                     )}
                                     /
                                     {byteToData(
-                                        pcStatus?.gpu.memory.total * 1024 * 1024
+                                        pcStatus?.gpu.memory.total
                                     )}{" "}
                                     |{" "}
                                     {byteToData(
-                                        pcStatus?.gpu.memory.free * 1024 * 1024
+                                        pcStatus?.gpu.memory.free
                                     )}{" "}
                                     free
                                 </p>

@@ -65,6 +65,7 @@ pub struct HistoriesData {
 pub struct StatusData {
     pub pass: Option<String>,
     pub dev: Option<bool>,
+    #[serde(rename = "_os")]
     pub os: String,
     pub hostname: String,
     pub version: String,
