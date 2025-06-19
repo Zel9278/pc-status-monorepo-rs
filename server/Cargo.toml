@@ -1,0 +1,47 @@
+[package]
+name = "pc-status-server"
+version = "0.1.0"
+edition = "2024"
+
+[[bin]]
+name = "server"
+path = "src/main.rs"
+
+[dependencies]
+pc-status-shared = { path = "../shared" }
+
+# WebSocket関連
+fastwebsockets = { workspace = true }
+tokio = { workspace = true }
+tokio-tungstenite = { workspace = true }
+
+# HTTP関連
+axum = { workspace = true, features = ["ws"] }
+tower = { workspace = true }
+tower-http = { workspace = true, features = ["fs"] }
+hyper = { workspace = true }
+
+# シリアライゼーション
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+# 非同期処理
+futures = { workspace = true }
+futures-util = { workspace = true }
+
+# エラーハンドリング
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+
+# ログ
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+
+# 環境変数
+dotenvy = { workspace = true }
+
+# UUID
+uuid = { workspace = true }
+
+# 時間処理
+chrono = { workspace = true }

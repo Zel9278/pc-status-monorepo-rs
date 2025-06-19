@@ -1,0 +1,53 @@
+[package]
+name = "pc-status-client"
+version = "0.1.0"
+edition = "2024"
+
+[[bin]]
+name = "client"
+path = "src/main.rs"
+
+[dependencies]
+pc-status-shared = { path = "../shared" }
+
+# WebSocket関連
+tokio = { workspace = true }
+tokio-tungstenite = { workspace = true }
+
+# シリアライゼーション
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+# 非同期処理
+futures = { workspace = true }
+futures-util = { workspace = true }
+
+# エラーハンドリング
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+
+# ログ
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+
+# 環境変数
+dotenvy = { workspace = true }
+
+# UUID
+uuid = { workspace = true }
+
+# 時間処理
+chrono = { workspace = true }
+
+# システム情報
+sysinfo = { workspace = true }
+
+# ネットワーク
+reqwest = { workspace = true }
+
+# 追加の依存関係（既存クライアントから移植）
+arc-swap = "1.7"
+cfg-if = "1.0"
+itertools = "0.14"
+regex = "1.11"
+self_update = "0.42"

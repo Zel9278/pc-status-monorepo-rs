@@ -1,0 +1,64 @@
+[workspace]
+members = [
+    "server",
+    "client",
+    "shared",
+    "frontend"
+]
+resolver = "2"
+
+[workspace.dependencies]
+# WebSocket関連
+fastwebsockets = "0.10.0"
+tokio = { version = "1.45.1", features = ["full"] }
+tokio-tungstenite = "0.27.0"
+
+# HTTP関連
+axum = { version = "0.8.4", features = ["ws"] }
+tower = "0.5.2"
+tower-http = { version = "0.6.6", features = ["cors"] }
+hyper = "1.6.0"
+
+# シリアライゼーション
+serde = { version = "1.0.219", features = ["derive"] }
+serde_json = "1.0.140"
+
+# 非同期処理
+futures = "0.3.31"
+futures-util = "0.3.31"
+
+# エラーハンドリング
+anyhow = "1.0.98"
+thiserror = "2.0.12"
+
+# ログ
+tracing = "0.1.41"
+tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
+log = "0.4"
+
+# 環境変数
+dotenvy = "0.15.7"
+
+# UUID
+uuid = { version = "1.17.0", features = ["v4", "serde"] }
+
+# 時間処理
+chrono = { version = "0.4.41", features = ["serde"] }
+
+# システム情報（クライアント用）
+sysinfo = { version = "0.35.2", default-features = false, features = ["disk", "multithread", "system"] }
+
+# ネットワーク
+reqwest = { version = "0.12.20", features = ["json"] }
+
+[profile.release]
+strip = "symbols"
+lto = "fat"
+codegen-units = 1
+
+# Cross-compilation configuration
+[target.aarch64-unknown-linux-musl]
+linker = "aarch64-linux-gnu-gcc"
+
+[target.x86_64-unknown-linux-musl]
+linker = "x86_64-linux-gnu-gcc"

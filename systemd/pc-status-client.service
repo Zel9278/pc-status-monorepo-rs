@@ -1,0 +1,27 @@
+[Unit]
+Description=PC Status Monitor Client
+After=network.target pc-status-server.service
+Wants=network.target
+Requires=pc-status-server.service
+
+[Service]
+Type=simple
+User=pc-status
+Group=pc-status
+WorkingDirectory=/opt/pc-status
+ExecStart=/opt/pc-status/client
+EnvironmentFile=/opt/pc-status/client.env
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+# Security settings
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/pc-status
+
+[Install]
+WantedBy=multi-user.target
