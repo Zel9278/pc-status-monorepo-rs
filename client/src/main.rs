@@ -22,7 +22,7 @@ use crate::system_info::SystemInfoCollector;
 #[tokio::main]
 async fn main() -> Result<()> {
     // rustlsのデフォルトCryptoProviderを初期化
-    rustls::crypto::aws_lc_rs::default_provider()
+    rustls::crypto::ring::default_provider()
         .install_default()
         .expect("Failed to install rustls crypto provider");
 

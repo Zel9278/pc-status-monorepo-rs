@@ -52,7 +52,7 @@ sysinfo = { version = "0.35.2", default-features = false, features = ["disk", "m
 reqwest = { version = "0.12.20", default-features = false, features = ["json", "rustls-tls"] }
 
 # TLS関連
-rustls = "0.23.0"
+rustls = { version = "0.23.0", default-features = false, features = ["ring"] }
 webpki-roots = "0.26.0"
 
 [profile.release]
