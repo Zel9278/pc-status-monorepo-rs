@@ -29,13 +29,13 @@ The easiest way using pre-built binaries.
 3. Download the required components:
 
 **Client (System Information Collection):**
-   - **macOS (M1/M2)**: `pc-status-client-apple-arm64.tar.gz`
+   - **macOS (M1/M2)**: `pc-status-client-macos-arm64.tar.gz`
    - **Windows 64-bit**: `pc-status-client-windows-x64.zip`
    - **Linux 64-bit**: `pc-status-client-linux-x64.tar.gz`
    - **Linux ARM64**: `pc-status-client-linux-arm64.tar.gz`
 
 **Backend (Server):**
-   - **macOS (M1/M2)**: `pc-status-backend-apple-arm64.tar.gz`
+   - **macOS (M1/M2)**: `pc-status-backend-macos-arm64.tar.gz`
    - **Windows 64-bit**: `pc-status-backend-windows-x64.zip`
    - **Linux 64-bit**: `pc-status-backend-linux-x64.tar.gz`
    - **Linux ARM64**: `pc-status-backend-linux-arm64.tar.gz`

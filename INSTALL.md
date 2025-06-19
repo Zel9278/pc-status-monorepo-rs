@@ -29,13 +29,13 @@ PC Status Monitor (Rust Monorepo) のインストール手順を説明します�
 3. 必要なコンポーネントをダウンロード:
 
 **クライアント（システム情報収集）:**
-   - **macOS (M1/M2)**: `pc-status-client-apple-arm64.tar.gz`
+   - **macOS (M1/M2)**: `pc-status-client-macos-arm64.tar.gz`
    - **Windows 64-bit**: `pc-status-client-windows-x64.zip`
    - **Linux 64-bit**: `pc-status-client-linux-x64.tar.gz`
    - **Linux ARM64**: `pc-status-client-linux-arm64.tar.gz`
 
 **バックエンド（サーバー）:**
-   - **macOS (M1/M2)**: `pc-status-backend-apple-arm64.tar.gz`
+   - **macOS (M1/M2)**: `pc-status-backend-macos-arm64.tar.gz`
    - **Windows 64-bit**: `pc-status-backend-windows-x64.zip`
    - **Linux 64-bit**: `pc-status-backend-linux-x64.tar.gz`
    - **Linux ARM64**: `pc-status-backend-linux-arm64.tar.gz`
