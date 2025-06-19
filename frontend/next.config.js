@@ -8,18 +8,31 @@ console.log('Next.js Config Environment:', {
 });
 
 const isStaticExport = !!(process.env.CI || process.env.NODE_ENV === 'production');
-const isGitHubPages = process.env.CI; // GitHub Pages deployment
+const isGitHubPages = process.env.CI && !process.env.CUSTOM_DOMAIN; // GitHub Pages deployment
+const isCustomDomain = process.env.CUSTOM_DOMAIN; // Custom domain deployment
+
+console.log('Deployment configuration:', {
+    isStaticExport,
+    isGitHubPages,
+    isCustomDomain,
+    CI: process.env.CI,
+    CUSTOM_DOMAIN: process.env.CUSTOM_DOMAIN
+});
 
 const nextConfig = {
     reactStrictMode: true,
-    // Use static export for GitHub Pages deployment
+    // Use static export for production builds
     ...(isStaticExport && {
         output: 'export',
         trailingSlash: true,
-        // Only use basePath for GitHub Pages, not local production builds
+        // GitHub Pages specific configuration (username.github.io/repo-name)
         ...(isGitHubPages && {
             assetPrefix: '/pc-status-monorepo-rs',
             basePath: '/pc-status-monorepo-rs',
+        }),
+        // Custom domain configuration (pc-status.net) - no prefix needed
+        ...(isCustomDomain && {
+            // No assetPrefix or basePath for custom domain
         }),
     }),
     images: {

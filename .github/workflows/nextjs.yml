@@ -92,6 +92,7 @@ jobs:
         env:
           NODE_ENV: production
           CI: true
+          CUSTOM_DOMAIN: true
 
       - name: List build output
         run: |
