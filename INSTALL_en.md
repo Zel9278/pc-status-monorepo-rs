@@ -24,18 +24,18 @@ The easiest way using pre-built binaries.
 
 #### 1. Download Release
 
-1. Visit the [GitHub Releases page](https://github.com/your-username/pc-status-monorepo-rs/releases)
+1. Visit the [GitHub Releases page](https://github.com/Zel9278/pc-status-monorepo-rs/releases)
 2. Select the latest release
 3. Download the required components:
 
 **Client (System Information Collection):**
-   - **macOS (M1/M2)**: `pc-status-client-macos-arm64.tar.gz`
+   - **macOS (M1/M2)**: `pc-status-client-apple-arm64.tar.gz`
    - **Windows 64-bit**: `pc-status-client-windows-x64.zip`
    - **Linux 64-bit**: `pc-status-client-linux-x64.tar.gz`
    - **Linux ARM64**: `pc-status-client-linux-arm64.tar.gz`
 
 **Backend (Server):**
-   - **macOS (M1/M2)**: `pc-status-backend-macos-arm64.tar.gz`
+   - **macOS (M1/M2)**: `pc-status-backend-apple-arm64.tar.gz`
    - **Windows 64-bit**: `pc-status-backend-windows-x64.zip`
    - **Linux 64-bit**: `pc-status-backend-linux-x64.tar.gz`
    - **Linux ARM64**: `pc-status-backend-linux-arm64.tar.gz`
@@ -190,8 +190,8 @@ cp .env.example .env
 Edit the `.env` file:
 ```env
 # Server URL (either PCSC_URI or SERVER_URL works)
-PCSC_URI=ws://localhost:3000/server
-SERVER_URL=ws://localhost:3000/server
+PCSC_URI=wss://www.pc-status.net/server
+SERVER_URL=wss://www.pc-status.net/server
 
 # Authentication password (same as server)
 PASS=sIvnjGO4eSftbiYh4aL29wlu9DUpnk3yAAaq2aRpbysEFBSYsh5i850HEvvpOPj7wha7jXIMcnWXyn51PKCPSZEOZgXdWRIXLCkAJnVGrtJXZGr0J9C5YiYCQQ4ZBBFz
@@ -431,7 +431,7 @@ To use a custom WebSocket server:
 1. Go to GitHub repository **Settings** → **Secrets and variables** → **Actions**
 2. Add a new variable in the **Variables** tab:
    - **Name**: `NEXT_PUBLIC_WS_URL`
-   - **Value**: `wss://your-server.com/ws`
+   - **Value**: `wss://www.pc-status.net/server`
 
 ### 3. Deploy
 
@@ -447,7 +447,7 @@ git push origin main
 
 After deployment completes, access at:
 ```
-https://your-username.github.io/pc-status-monorepo-rs/
+https://pc-status.net/
 ```
 
 ## Next Steps

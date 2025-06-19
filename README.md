@@ -102,9 +102,9 @@ pnpm run dev
 
 #### GitHub Pages
 フロントエンドはGitHub Pagesで自動デプロイされます：
-- **URL**: https://your-username.github.io/pc-status-monorepo-rs/
+- **URL**: https://pc-status.net/
 - **自動デプロイ**: mainブランチのfrontend/配下の変更時（nextjs.ymlワークフロー）
-- **WebSocket接続**: デフォルトで公式サーバー（wss://pcss.eov2.com/ws）に接続
+- **WebSocket接続**: 公式サーバー（wss://www.pc-status.net/server）に接続
 
 #### 環境変数設定
 フロントエンドのWebSocket接続先を変更するには：
@@ -117,8 +117,8 @@ NEXT_PUBLIC_WS_URL=ws://your-server-ip:port/server
 
 2. **本番環境**: `frontend/.env`ファイルを編集
 ```bash
-# GitHub Pages用のWebSocketサーバーURL（フロントエンド用は/serverエンドポイント）
-NEXT_PUBLIC_WS_URL=wss://your-server.com/server
+# 本番環境用のWebSocketサーバーURL（フロントエンド用は/serverエンドポイント）
+NEXT_PUBLIC_WS_URL=wss://www.pc-status.net/server
 ```
 
 **重要**:
@@ -155,10 +155,10 @@ ifconfig
 5. **接続テスト**
 ```bash
 # curlでHTTPエンドポイントをテスト
-curl http://100.108.46.68:3000
+curl http://localhost:3000
 
 # WebSocketテスト（ブラウザ開発者ツールで）
-new WebSocket('ws://100.108.46.68:3000/server')
+new WebSocket('ws://localhost:3000/server')
 ```
 
 6. **ログレベルの設定**

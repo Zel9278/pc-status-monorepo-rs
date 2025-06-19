@@ -24,18 +24,18 @@ PC Status Monitor (Rust Monorepo) のインストール手順を説明します�
 
 #### 1. リリースのダウンロード
 
-1. [GitHubリリースページ](https://github.com/your-username/pc-status-monorepo-rs/releases)にアクセス
+1. [GitHubリリースページ](https://github.com/Zel9278/pc-status-monorepo-rs/releases)にアクセス
 2. 最新リリースを選択
 3. 必要なコンポーネントをダウンロード:
 
 **クライアント（システム情報収集）:**
-   - **macOS (M1/M2)**: `pc-status-client-macos-arm64.tar.gz`
+   - **macOS (M1/M2)**: `pc-status-client-apple-arm64.tar.gz`
    - **Windows 64-bit**: `pc-status-client-windows-x64.zip`
    - **Linux 64-bit**: `pc-status-client-linux-x64.tar.gz`
    - **Linux ARM64**: `pc-status-client-linux-arm64.tar.gz`
 
 **バックエンド（サーバー）:**
-   - **macOS (M1/M2)**: `pc-status-backend-macos-arm64.tar.gz`
+   - **macOS (M1/M2)**: `pc-status-backend-apple-arm64.tar.gz`
    - **Windows 64-bit**: `pc-status-backend-windows-x64.zip`
    - **Linux 64-bit**: `pc-status-backend-linux-x64.tar.gz`
    - **Linux ARM64**: `pc-status-backend-linux-arm64.tar.gz`
@@ -190,8 +190,8 @@ cp .env.example .env
 `.env`ファイルを編集:
 ```env
 # サーバーURL（PCSC_URIまたはSERVER_URLのどちらでも可）
-PCSC_URI=ws://localhost:3000/server
-SERVER_URL=ws://localhost:3000/server
+PCSC_URI=wss://www.pc-status.net/server
+SERVER_URL=wss://www.pc-status.net/server
 
 # 認証パスワード（サーバーと同じパスワード）
 PASS=sIvnjGO4eSftbiYh4aL29wlu9DUpnk3yAAaq2aRpbysEFBSYsh5i850HEvvpOPj7wha7jXIMcnWXyn51PKCPSZEOZgXdWRIXLCkAJnVGrtJXZGr0J9C5YiYCQQ4ZBBFz
@@ -431,7 +431,7 @@ sudo systemctl disable pc-status-client
 1. GitHubリポジトリの **Settings** → **Secrets and variables** → **Actions**
 2. **Variables** タブで新しい変数を追加：
    - **Name**: `NEXT_PUBLIC_WS_URL`
-   - **Value**: `wss://your-server.com/ws`
+   - **Value**: `wss://www.pc-status.net/server`
 
 ### 3. デプロイ
 
@@ -447,7 +447,7 @@ git push origin main
 
 デプロイ完了後、以下のURLでアクセスできます：
 ```
-https://your-username.github.io/pc-status-monorepo-rs/
+https://pc-status.net/
 ```
 
 ## 次のステップ
