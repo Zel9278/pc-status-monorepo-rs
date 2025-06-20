@@ -1,4 +1,4 @@
-#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+#![cfg_attr(all(not(debug_assertions), not(feature = "debug_console")), windows_subsystem = "windows")]
 
 mod gpu;
 mod system_info;
@@ -7,7 +7,7 @@ mod uptime_formatter;
 mod updater;
 
 use anyhow::Result;
-use dotenvy::dotenv;
+
 use futures_util::{SinkExt, StreamExt};
 use pc_status_shared::{ClientMessage, ServerMessage};
 use std::{env, path::Path, process, time::Duration};
@@ -21,16 +21,56 @@ use crate::system_info::SystemInfoCollector;
 
 #[tokio::main]
 async fn main() -> Result<()> {
+    // 最初に.envファイルを読み込み（複数の場所を試行）
+    let env_paths = ["client/.env", ".env"];
+    let mut env_loaded = false;
+
+    for env_path in &env_paths {
+        if Path::new(env_path).exists() {
+            println!("Loading .env from: {}", env_path);
+            match dotenvy::from_path(env_path) {
+                Ok(_) => {
+                    env_loaded = true;
+                    break;
+                }
+                Err(e) => {
+                    println!("Failed to load .env from {}: {}", env_path, e);
+                }
+            }
+        }
+    }
+
+    if !env_loaded {
+        println!("No .env file found in any of the expected locations");
+    }
+
+    // DEV_MODE環境変数がtrueの場合、Windowsでコンソールを表示
+    #[cfg(windows)]
+    {
+        if std::env::var("DEV_MODE").unwrap_or_default().to_lowercase() == "true" {
+            unsafe {
+                use windows::Win32::System::Console::{AllocConsole, FreeConsole};
+                use windows::Win32::Foundation::GetLastError;
+
+                println!("DEV_MODE is enabled, allocating console...");
+
+                // 既存のコンソールがある場合は解放
+                let _ = FreeConsole();
+
+                // 新しいコンソールを割り当て
+                if AllocConsole().is_err() {
+                    eprintln!("Failed to allocate console: {:?}", GetLastError());
+                } else {
+                    println!("Console allocated successfully!");
+                }
+            }
+        }
+    }
+
     // rustlsのデフォルトCryptoProviderを初期化
     rustls::crypto::ring::default_provider()
         .install_default()
         .expect("Failed to install rustls crypto provider");
-
-    // .envファイルの存在確認と読み込み
-    let env_exists = Path::new(".env").exists();
-    if env_exists {
-        dotenv().expect(".env file not found");
-    }
 
     // サポートされているOSかチェック
     if !IS_SUPPORTED_SYSTEM {
