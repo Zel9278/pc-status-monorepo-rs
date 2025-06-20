@@ -124,27 +124,71 @@ const Status = ({ children, status, pc, onFocusClick }: Props) => {
                     <div className="stat">
                         <div className="stat-figure text-secondary"></div>
                         <div className="stat-title">GPU</div>
-                        <div className="stat-value text-sm">
+                        <div className="stat-value">
                             {(status || {})[pc]?.gpus && (status || {})[pc]?.gpus.length > 0 ? (
-                                <div className="text-left">
-                                    {(status || {})[pc]?.gpus.map((gpu, index) => (
-                                        <div key={index} className="mb-1">
-                                            {gpu.name}
-                                        </div>
-                                    ))}
-                                </div>
+                                (() => {
+                                    const gpus = (status || {})[pc]?.gpus;
+                                    // 使用率が取得可能な最初のGPUを探す
+                                    const validGpu = gpus.find(gpu =>
+                                        !(gpu.name.toLowerCase().includes('intel') && gpu.usage === 0)
+                                    );
+
+                                    if (validGpu) {
+                                        return (
+                                            <>
+                                                {Math.floor(validGpu.usage)}%
+                                                <span className="text-sm ml-1">({gpus.length})</span>
+                                            </>
+                                        );
+                                    } else {
+                                        // すべてのGPUがIntel（使用率取得不可）の場合
+                                        return (
+                                            <>
+                                                N/A
+                                                <span className="text-sm ml-1">({gpus.length})</span>
+                                            </>
+                                        );
+                                    }
+                                })()
                             ) : (
-                                <div>No GPU</div>
+                                <>NaN%</>
                             )}
                         </div>
                         <div className="stat-desc">
                             {(status || {})[pc]?.gpus && (status || {})[pc]?.gpus.length > 0 ? (
-                                <div className="text-xs text-gray-500">
-                                    {(status || {})[pc]?.gpus.length} GPU{(status || {})[pc]?.gpus.length > 1 ? 's' : ''}
-                                </div>
+                                (() => {
+                                    const gpus = (status || {})[pc]?.gpus;
+                                    // 使用率が取得可能な最初のGPUを探す
+                                    const validGpu = gpus.find(gpu =>
+                                        !(gpu.name.toLowerCase().includes('intel') && gpu.usage === 0)
+                                    );
+
+                                    if (validGpu) {
+                                        return (
+                                            <div className="h-6 flex items-center justify-center">
+                                                <Progressbar
+                                                    value={validGpu.usage}
+                                                    className="w-20 mx-auto my-0"
+                                                />
+                                            </div>
+                                        );
+                                    } else {
+                                        // すべてのGPUがIntel（使用率取得不可）の場合は名前を表示
+                                        return (
+                                            <div className="h-6 flex items-center justify-center">
+                                                <div className="text-xs text-gray-500 truncate max-w-20">
+                                                    {gpus[0].name}
+                                                </div>
+                                            </div>
+                                        );
+                                    }
+                                })()
                             ) : (
-                                <div className="text-xs text-gray-500">
-                                    No GPU detected
+                                <div className="h-6 flex items-center justify-center">
+                                    <Progressbar
+                                        value={0}
+                                        className="w-20 mx-auto my-0"
+                                    />
                                 </div>
                             )}
                         </div>
