@@ -124,27 +124,28 @@ const Status = ({ children, status, pc, onFocusClick }: Props) => {
                     <div className="stat">
                         <div className="stat-figure text-secondary"></div>
                         <div className="stat-title">GPU</div>
-                        <div className="stat-value">
+                        <div className="stat-value text-sm">
                             {(status || {})[pc]?.gpus && (status || {})[pc]?.gpus.length > 0 ? (
-                                <>
-                                    {Math.floor((status || {})[pc]?.gpus.reduce((sum, gpu) => sum + gpu.usage, 0) / (status || {})[pc]?.gpus.length)}%
-                                    <span className="text-sm ml-1">({(status || {})[pc]?.gpus.length})</span>
-                                </>
+                                <div className="text-left">
+                                    {(status || {})[pc]?.gpus.map((gpu, index) => (
+                                        <div key={index} className="mb-1">
+                                            {gpu.name}
+                                        </div>
+                                    ))}
+                                </div>
                             ) : (
-                                <>NaN%</>
+                                <div>No GPU</div>
                             )}
                         </div>
                         <div className="stat-desc">
                             {(status || {})[pc]?.gpus && (status || {})[pc]?.gpus.length > 0 ? (
-                                <Progressbar
-                                    value={(status || {})[pc]?.gpus.reduce((sum, gpu) => sum + gpu.usage, 0) / (status || {})[pc]?.gpus.length}
-                                    className="w-20 mx-auto my-0"
-                                />
+                                <div className="text-xs text-gray-500">
+                                    {(status || {})[pc]?.gpus.length} GPU{(status || {})[pc]?.gpus.length > 1 ? 's' : ''}
+                                </div>
                             ) : (
-                                <Progressbar
-                                    value={0}
-                                    className="w-20 mx-auto my-0"
-                                />
+                                <div className="text-xs text-gray-500">
+                                    No GPU detected
+                                </div>
                             )}
                         </div>
                     </div>

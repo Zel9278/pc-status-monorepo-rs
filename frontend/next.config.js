@@ -44,11 +44,11 @@ const nextConfig = {
             return [
                 {
                     source: '/ws',
-                    destination: 'http://localhost:3000/ws',
+                    destination: 'http://localhost:3001/ws',
                 },
                 {
                     source: '/server',
-                    destination: 'http://localhost:3000/server',
+                    destination: 'http://localhost:3001/server',
                 },
             ]
         }

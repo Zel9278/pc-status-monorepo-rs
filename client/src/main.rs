@@ -53,7 +53,7 @@ async fn main() -> Result<()> {
     println!("This OS is supported!");
     let server_url = env::var("PCSC_URI")
         .or_else(|_| env::var("SERVER_URL"))
-        .unwrap_or_else(|_| "ws://localhost:3000/server".to_string());
+        .unwrap_or_else(|_| "ws://localhost:3001/server".to_string());
 
     let password = env::var("PASS")
         .expect("PASS environment variable must be set");
@@ -114,6 +114,8 @@ async fn connect_to_server(
     let sync_task = tokio::spawn(async move {
         let mut interval = tokio::time::interval(Duration::from_secs(1));
         let mut collector = SystemInfoCollector::new();
+        let mut send_count = 0u64;
+        let start_time = std::time::Instant::now();
 
         loop {
             interval.tick().await;
@@ -125,7 +127,17 @@ async fn connect_to_server(
 
                     let sync_message = ClientMessage::Sync(status_data);
                     if let Ok(json) = sync_message.to_json() {
-                        if write_for_sync.send(Message::Text(json.into())).await.is_err() {
+                        if write_for_sync.send(Message::Text(json.into())).await.is_ok() {
+                            send_count += 1;
+
+                            // 10秒ごとに統計情報をログ出力
+                            if send_count % 10 == 0 {
+                                let elapsed = start_time.elapsed();
+                                let avg_interval = elapsed.as_millis() as f64 / send_count as f64;
+                                info!("Client send stats: {} messages in {:.2}s (avg: {:.1}ms interval)",
+                                      send_count, elapsed.as_secs_f64(), avg_interval);
+                            }
+                        } else {
                             break;
                         }
                     }

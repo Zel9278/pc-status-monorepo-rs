@@ -73,9 +73,15 @@ const Focus = ({ children, status, pc, onClose }: Props) => {
             color: `hsl(${storageIndex * 120}, 60%, 50%)`
         })) : []
 
-    // GPU chart data for multiple GPUs
+    // GPU chart data for multiple GPUs (Intel GPUを除外)
     const gpuDatasets = pcStatus.gpus && pcStatus.gpus.length > 0 ?
         pcStatus.gpus.flatMap((gpu, gpuIndex) => {
+            // Intel GPUの場合はチャートデータを生成しない
+            const isIntelGpu = gpu.name.toLowerCase().includes('intel') && gpu.usage === 0;
+            if (isIntelGpu) {
+                return [];
+            }
+
             const gpuHistory = pcStatus.histories.map((history) =>
                 history.gpus && history.gpus[gpuIndex] ? history.gpus[gpuIndex] : null
             )
@@ -258,51 +264,66 @@ const Focus = ({ children, status, pc, onClose }: Props) => {
                                 <div className="bg-slate-700 w-full h-0.5 rounded my-2" />
                                 <p>GPUs ({pcStatus.gpus.length} detected):</p>
 
-                                {pcStatus.gpus.map((gpu, index) => (
-                                    <div key={index} className="mb-4">
-                                        <p className="font-semibold">GPU {index + 1}: {gpu.name}</p>
+                                {pcStatus.gpus.map((gpu, index) => {
+                                    // Intel GPUの場合は名前のみ表示
+                                    const isIntelGpu = gpu.name.toLowerCase().includes('intel') && gpu.usage === 0;
 
-                                        <div className="flex items-center">
-                                            <p>Usage:</p>
-                                            <Progressbar
-                                                value={gpu.usage}
-                                                className="w-full mx-3"
-                                            />{" "}
-                                            <p>{Math.floor(gpu.usage)}%</p>
-                                        </div>
+                                    return (
+                                        <div key={index} className="mb-4">
+                                            <p className="font-semibold">GPU {index + 1}: {gpu.name}</p>
 
-                                        <p>
-                                            VRAM:{" "}
-                                            {byteToData(
-                                                gpu.memory.total - gpu.memory.free
+                                            {!isIntelGpu ? (
+                                                <>
+                                                    <div className="flex items-center">
+                                                        <p>Usage:</p>
+                                                        <Progressbar
+                                                            value={gpu.usage}
+                                                            className="w-full mx-3"
+                                                        />{" "}
+                                                        <p>{Math.floor(gpu.usage)}%</p>
+                                                    </div>
+
+                                                    <p>
+                                                        VRAM:{" "}
+                                                        {byteToData(
+                                                            gpu.memory.total - gpu.memory.free
+                                                        )}
+                                                        /
+                                                        {byteToData(gpu.memory.total)}{" "}
+                                                        |{" "}
+                                                        {byteToData(gpu.memory.free)}{" "}
+                                                        free
+                                                    </p>
+
+                                                    <div className="flex items-center">
+                                                        <p>VRAM:</p>
+                                                        <Progressbar
+                                                            value={gpuMemPercents[index] || 0}
+                                                            className="w-full mx-3"
+                                                        />{" "}
+                                                        <p>{Math.floor(gpuMemPercents[index] || 0)}%</p>
+                                                    </div>
+                                                </>
+                                            ) : (
+                                                <p className="text-gray-400 text-sm">
+                                                    Usage data not available for Intel integrated GPU
+                                                </p>
                                             )}
-                                            /
-                                            {byteToData(gpu.memory.total)}{" "}
-                                            |{" "}
-                                            {byteToData(gpu.memory.free)}{" "}
-                                            free
-                                        </p>
 
-                                        <div className="flex items-center">
-                                            <p>VRAM:</p>
-                                            <Progressbar
-                                                value={gpuMemPercents[index] || 0}
-                                                className="w-full mx-3"
-                                            />{" "}
-                                            <p>{Math.floor(gpuMemPercents[index] || 0)}%</p>
+                                            {index < pcStatus.gpus.length - 1 && (
+                                                <div className="bg-slate-600 w-full h-0.5 rounded my-2" />
+                                            )}
                                         </div>
+                                    );
+                                })}
 
-                                        {index < pcStatus.gpus.length - 1 && (
-                                            <div className="bg-slate-600 w-full h-0.5 rounded my-2" />
-                                        )}
-                                    </div>
-                                ))}
-
-                                <CanvasChart
-                                    {...chartConfig}
-                                    datasets={gpuDatasets}
-                                    title="GPU Usage"
-                                />
+                                {gpuDatasets.length > 0 && (
+                                    <CanvasChart
+                                        {...chartConfig}
+                                        datasets={gpuDatasets}
+                                        title="GPU Usage"
+                                    />
+                                )}
                             </>
                         )}
                         {pcStatus.loadavg && (

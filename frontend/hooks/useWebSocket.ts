@@ -20,7 +20,9 @@ export const useWebSocket = (url: string): UseWebSocketReturn => {
     const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null)
     const reconnectAttempts = useRef<number>(0)
     const maxReconnectAttempts = 10
-    const reconnectDelay = 5000
+    const reconnectDelay = 2000  // 2秒に短縮
+    const lastUpdateTime = useRef<number>(0)
+    const updateCount = useRef<number>(0)
 
     // デバッグ用：環境変数の確認
     console.log('Environment variables:', {
@@ -92,19 +94,9 @@ export const useWebSocket = (url: string): UseWebSocketReturn => {
                             console.log('Server greeting:', data.data)
                             break
                         case 'Status':
-                            // データが配列の場合は最初の要素を使用、オブジェクトの場合はそのまま使用
-                            if (Array.isArray(data.data)) {
-                                if (data.data.length > 0) {
-                                    setStatus(data.data[0])
-                                } else {
-                                    setStatus({})
-                                }
-                            } else if (data.data && typeof data.data === 'object') {
-                                setStatus(data.data)
-                            } else {
-                                console.warn('Unexpected status data format:', data.data)
-                                setStatus({})
-                            }
+                            // Statusデータをそのまま設定
+                            setStatus(data.data)
+                            console.log('Status updated:', data.data)
                             break
                         case 'Toast':
                             // トーストメッセージをカスタムイベントとして発火
